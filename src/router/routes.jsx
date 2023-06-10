@@ -3,6 +3,7 @@ import PanelLayout from "../layouts/PanelLayout";
 import Home from "../pages/Home";
 import Modules from "../pages/Modules";
 import Library from "../pages/Library";
+import AddModule from "../pages/AddModule";
 
 const Routes = () => {
 
@@ -17,7 +18,11 @@ const Routes = () => {
                 },
                 {
                     path: '/modules',
-                    element: <Modules />
+                    element: <Modules />,
+                },
+                {
+                    path: '/modules/add',
+                    element: <AddModule />
                 },
                 {
                     path: '/centralized-library',

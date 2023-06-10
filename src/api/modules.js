@@ -2,7 +2,7 @@ import instance from './config';
 
 const modulesApi = {
     create: (data) => instance.post(`/modules`, data, { headers: { "Content-Type": 'multipart/form-data' } }),
-    read: (pageNo, limit, searchQuery) => instance.get(`/modules/getall?pageNo=${pageNo}&limit=${limit}&s=${searchQuery}`),
+    read: (subject, pageNo, limit, searchQuery) => instance.get(`/modules/getall?subject=${subject}&pageNo=${pageNo}&limit=${limit}&s=${searchQuery}`),
     update: (moduleId, data) => instance.put(`/modules/${moduleId}`, data, { headers: { "Content-Type": 'multipart/form-data' } }),
     delete: (moduleId) => instance.delete(`/modules/${moduleId}`),
 };
