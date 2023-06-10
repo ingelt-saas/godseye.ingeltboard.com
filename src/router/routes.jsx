@@ -1,6 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import PanelLayout from "../layouts/PanelLayout";
 import Home from "../pages/Home";
+import Modules from "../pages/Modules";
+import Library from "../pages/Library";
 
 const Routes = () => {
 
@@ -12,7 +14,15 @@ const Routes = () => {
                 {
                     path: '/',
                     element: <Home />
-                }
+                },
+                {
+                    path: '/modules',
+                    element: <Modules />
+                },
+                {
+                    path: '/centralized-library',
+                    element: <Library />
+                },
             ]
         }
     ]);

@@ -63,6 +63,11 @@ const SideBar = () => {
             icon: <LibrarySVG />,
         },
         {
+            path: "/modules",
+            label: "Modules",
+            icon: <LibrarySVG />,
+        },
+        {
             path: "/discussion",
             label: "Community",
             icon: <DiscussionSVG />,
