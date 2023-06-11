@@ -30,6 +30,8 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import { Delete } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import AddItem from "../components/Library/AddItem";
 
 const Library = () => {
 
@@ -40,6 +42,7 @@ const Library = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [addModal, setAddModal] = useState(false);
 
     const openPopup = (file, link) => {
         setSelectedFile({ file, link });
@@ -233,6 +236,14 @@ const Library = () => {
                 <div className="flex items-end justify-end pt-5 sm:pt-0 md:pl-16 xl:pl-0">
                     <SearchBar handleSubmit={searchLibrary} />
                 </div>
+                <div className=''>
+                    <button
+                        onClick={() => setAddModal(true)}
+                        className='text-sm px-6 py-3 rounded-md shadow-md text-white bg-[#1B3B7D]'
+                    >
+                        Add Library Item
+                    </button>
+                </div>
             </Box>
 
             {isLoading && <div className="py-10 flex justify-center">
@@ -330,6 +341,8 @@ const Library = () => {
             ) : (
                 <VideoModal file={selectedFile?.link} showPopup={showPopup} closePopup={closePopup} />
             )}
+
+            {/* delete confirm modal  */}
             <DeleteConfirmModal
                 open={Boolean(deleteConfirm)}
                 data={deleteConfirm}
@@ -337,6 +350,14 @@ const Library = () => {
                 close={() => setDeleteConfirm(null)}
                 name='library item'
             />
+
+            {/* Add library item modal */}
+            <AddItem
+                open={addModal}
+                close={() => setAddModal(false)}
+                refetch={refetch}
+            />
+
         </Box>
     );
 };

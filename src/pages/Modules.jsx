@@ -16,14 +16,11 @@ import { Link } from 'react-router-dom';
 const Modules = () => {
 
     const [activeTab, setActiveTab] = useState(1);
-    const [modules, setModules] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
-    const [totalItems, setTotalItems] = useState(0);
-    const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({ page: 0, rows: 10 });
     const [selectedFile, setSelectedFile] = useState(null);
 
-    const { data, isLoading, refetch } = useQuery({
+    const { data: modules, isLoading, refetch } = useQuery({
         queryKey: ['modules', pagination, activeTab, searchQuery],
         queryFn: async () => {
             const subject = activeTab === 1 ? 'all' : (activeTab === 2 ? 'reading' : (activeTab === 3 ? 'writing' : (activeTab === 4 ? 'speaking' : 'listening')));
@@ -183,26 +180,26 @@ const Modules = () => {
             </Box>
 
 
-            {loading && <div className="py-10 flex justify-center">
+            {isLoading && <div className="py-10 flex justify-center">
                 <CircularProgress />
             </div>}
 
-            {!loading && (Array.isArray(modules) && modules.length > 0 ? <Box className='mt-5'>
+            {!isLoading && (Array.isArray(modules?.rows) && modules?.rows?.length > 0 ? <Box className='mt-5'>
                 <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 md:grid-cols-2 gap-y-5 pt-10">
-                    {modules.map((item, index) => (
-                        <div onClick={() => handleView(item.file)} className="p-3 bg-white rounded-xl h-full shadow-[0px_10px_36px_rgba(0,0,0,0.16),0px_0px_0px_1px_rgba(0,0,0,0.06)] scale-95 hover:scale-100 duration-200 transition-transform cursor-pointer" key={index}>
+                    {modules?.rows.map((item, index) => (
+                        <div onClick={() => handleView(item.file)} className="p-3 bg-white flex flex-col rounded-xl h-full shadow-[0px_10px_36px_rgba(0,0,0,0.16),0px_0px_0px_1px_rgba(0,0,0,0.06)] scale-95 hover:scale-100 duration-200 transition-transform cursor-pointer" key={index}>
                             <div className='rounded-2xl h-44 overflow-hidden'>
                                 <Image src={item.thumbnail} alt={item.name} className='w-full h-full object-cover' />
                             </div>
-                            <div className='mt-5'>
-                                <h4 className='flex justify-between gap-x-3 items-center'>
+                            <div className='mt-5 flex-col flex flex-1'>
+                                <h4 className='flex justify-between gap-x-3 items-start'>
                                     <span className='text-lg font-semibold text-[#00285A]'>{item.name}</span>
                                     {item.subject === 'writing' && <span className='capitalize text-sm font-medium bg-[#85E1ED33] rounded-full text-[#355A5F] py-1 px-4 shadow-md'>{item.subject}</span>}
                                     {item.subject === 'listening' && <span className='capitalize text-sm font-medium bg-[#FF898933] rounded-full text-[#663737] py-1 px-4 shadow-md'>{item.subject}</span>}
                                     {item.subject === 'reading' && <span className='capitalize text-sm font-medium bg-[#0064E133] rounded-full text-[#0064E1] py-1 px-4 shadow-md'>{item.subject}</span>}
                                     {item.subject === 'speaking' && <span className='capitalize text-sm font-medium bg-[#E19AF233] rounded-full text-[#5A3E61] py-1 px-4 shadow-md'>{item.subject}</span>}
                                 </h4>
-                                <p className='text-sm mt-3'>
+                                <p className='text-sm mt-3 flex-1'>
                                     {item.description?.length > 90 ? item.description.split('').slice(0, 90).join('') + '...' : item.description}
                                 </p>
                                 <p className='flex items-center justify-between mt-3'>
@@ -249,7 +246,7 @@ const Modules = () => {
                 </div>
 
                 <TablePagination component='div' color="primary"
-                    count={totalItems}
+                    count={modules?.count}
                     rowsPerPageOptions={
                         [10, 25, 50, 100]
                     }
