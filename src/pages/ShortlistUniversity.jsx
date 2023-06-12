@@ -7,6 +7,7 @@ import universityApi from "../api/university";
 import UniversityItem from "../components/ShortlistUniversity/UniversityItem";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import { toast } from "react-toastify";
+import PaginationComponent from "../components/shared/PaginationComponent";
 
 const ShortlistUniversity = () => {
 
@@ -103,19 +104,29 @@ const ShortlistUniversity = () => {
                         <CircularProgress />
                     </div>}
                     {!isLoading && (Array.isArray(universities?.rows) && universities?.rows?.length > 0 ?
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                            {universities?.rows.map(item =>
-                                <UniversityItem
-                                    university={item}
-                                    key={item.id}
-                                    deleteConfirm={setDeleteConfirm}
+                        <div>
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                {universities?.rows.map(item =>
+                                    <UniversityItem
+                                        university={item}
+                                        key={item.id}
+                                        deleteConfirm={setDeleteConfirm}
+                                    />
+                                )}
+                            </div>
+                            <div className="mt-10 mx-auto flex justify-center">
+                                <PaginationComponent
+                                    currentPage={pagination.page}
+                                    onPageChange={(page) => setPagination({ ...pagination, page: page })}
+                                    totalPages={Math.ceil(universities?.count / pagination.rows)}
                                 />
-                            )}
+                            </div>
                         </div>
                         : <Alert icon={false} severity="warning" className="mx-auto w-fit" >No University Found</Alert>
                     )}
                 </div>}
             </div>
+
             <DeleteConfirmModal
                 open={Boolean(deleteConfirm)}
                 close={() => setDeleteConfirm(null)}
