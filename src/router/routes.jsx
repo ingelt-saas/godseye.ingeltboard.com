@@ -4,10 +4,18 @@ import Home from "../pages/Home";
 import Modules from "../pages/Modules";
 import Library from "../pages/Library";
 import AddModule from "../pages/AddModule";
+import Institute from "../pages/Institute";
+import ShortlistUniversity from "../pages/ShortlistUniversity";
+import { useContext } from "react";
+import { AdminContext } from "../contexts";
+import LoginLayout from "../layouts/LoginLayout";
+import Loader from '../components/shared/Loader';
 
 const Routes = () => {
 
-    const router = createBrowserRouter([
+    const { loading, inGelt } = useContext(AdminContext);
+
+    const router = !inGelt ? createBrowserRouter([
         {
             path: '/',
             element: <PanelLayout />,
@@ -28,12 +36,25 @@ const Routes = () => {
                     path: '/centralized-library',
                     element: <Library />
                 },
+                {
+                    path: '/shortlist-university',
+                    element: <ShortlistUniversity />
+                },
+                {
+                    path: '/institute',
+                    element: <Institute />
+                },
             ]
+        }
+    ]) : createBrowserRouter([
+        {
+            path: '*',
+            element: <LoginLayout />,
         }
     ]);
 
     return (
-        <RouterProvider router={router}></RouterProvider>
+        loading ? <Loader /> : <RouterProvider router={router}></RouterProvider>
     );
 }
 
