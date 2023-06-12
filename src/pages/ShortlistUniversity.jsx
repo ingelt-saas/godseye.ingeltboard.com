@@ -98,7 +98,7 @@ const ShortlistUniversity = () => {
                 </Button>
             </div>
             <div className="mt-10">
-                {page === 'add-university' && <AddUniversity />}
+                {page === 'add-university' && <AddUniversity refetch={refetch} />}
                 {page === 'all-university' && <div className="px-3">
                     {isLoading && <div className="flex py-10 justify-center">
                         <CircularProgress />

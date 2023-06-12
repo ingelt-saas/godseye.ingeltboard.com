@@ -32,7 +32,7 @@ const TextInputField = ({ label, name, defaultValue, validation, Form, type }) =
     );
 }
 
-const AddUniversity = () => {
+const AddUniversity = ({ refetch }) => {
 
     const [error, setError] = useState('');
     const [selectedLogo, setSelectedLogo] = useState(null);
@@ -40,7 +40,7 @@ const AddUniversity = () => {
     const [loading, setLoading] = useState(false);
 
     const Form = useForm();
-    const { handleSubmit, resetField } = Form;
+    const { handleSubmit, reset } = Form;
     const { getRootProps, getInputProps } = useDropzone({
         multiple: false,
         accept: {
@@ -134,7 +134,9 @@ const AddUniversity = () => {
         setError('');
         try {
             await universityApi.create(formData);
-            resetField();
+            reset();
+            refetch();
+            setSelectedLogo(null);
             toast.success('University successfully added');
         } catch (err) {
             setError('Sorry! Something went wrong');
@@ -174,6 +176,7 @@ const AddUniversity = () => {
                     <div className="col-span-2 mt-5">
                         {error && <p className="text-sm text-center text-red-500 font-medium mb-3">{error}</p>}
                         <Button
+                            disabled={loading}
                             variant="contained"
                             sx={{
                                 backgroundColor: '#001E43',
