@@ -4,6 +4,8 @@ import Home from "../pages/Home";
 import Modules from "../pages/Modules";
 import Library from "../pages/Library";
 import AddModule from "../pages/AddModule";
+import Institute from "../pages/Institute";
+import ShortlistUniversity from "../pages/ShortlistUniversity";
 
 const Routes = () => {
 
@@ -27,6 +29,14 @@ const Routes = () => {
                 {
                     path: '/centralized-library',
                     element: <Library />
+                },
+                {
+                    path: '/shortlist-university',
+                    element: <ShortlistUniversity />
+                },
+                {
+                    path: '/institute',
+                    element: <Institute />
                 },
             ]
         }
