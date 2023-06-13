@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import AddInstitute from "../components/Institutes/AddInstitute";
+import AllInstitutes from "../components/Institutes/AllInstitutes";
 
 const Institute = () => {
 
@@ -91,6 +92,7 @@ const Institute = () => {
             </div>
             <div className="mt-5">
                 {page === 'add-institute' && <AddInstitute />}
+                {page === 'all' && <AllInstitutes />}
             </div>
         </div>
     );

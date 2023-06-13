@@ -1,18 +1,31 @@
 import { Typography, TextField, Button } from "@mui/material";
 import { useState } from "react";
+import authApi from "../api/auth";
+import Cookies from "js-cookie";
 
 const LoginLayout = () => {
 
     const [data, setData] = useState({ email: '', password: '' });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Handle form submission here
+        setLoading(true);
+        try {
+            const res = await authApi.login(data.email, data.password);
+            Cookies.set('ingelt_token', res.data?.token, { expires: 1 });
+            window.location.reload();
+        } catch (err) {
+            setError(err?.response?.data?.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="w-full h-screen grid place-items-center">
-            <div className='rounded-lg shadow-lg py-10 px-5'>
+        <div className="w-full h-screen grid place-items-center bg-[#f2f2f2]">
+            <div className='rounded-lg  bg-white shadow-lg py-10 px-5 w-11/12 sm:w-[500px]'>
                 <Typography component="h1" variant="h5" className="text-center">
                     Sign in
                 </Typography>
@@ -44,7 +57,9 @@ const LoginLayout = () => {
                         size="small"
                         onChange={(e) => setData({ ...data, password: e.target.value })}
                     />
+                    {error && <p className="text-center text-red-500 text-xs font-medium">{error}</p>}
                     <Button
+                        disabled={Object.values(data).includes('') || loading}
                         type="submit"
                         fullWidth
                         variant="contained"
