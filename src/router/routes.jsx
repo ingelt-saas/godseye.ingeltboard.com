@@ -10,12 +10,13 @@ import { useContext } from "react";
 import { AdminContext } from "../contexts";
 import LoginLayout from "../layouts/LoginLayout";
 import Loader from '../components/shared/Loader';
+import Blogs from "../pages/Blogs";
 
 const Routes = () => {
 
     const { loading, inGelt } = useContext(AdminContext);
 
-    const router = inGelt ? createBrowserRouter([
+    const router = !inGelt ? createBrowserRouter([
         {
             path: '/',
             element: <PanelLayout />,
@@ -43,6 +44,10 @@ const Routes = () => {
                 {
                     path: '/institute',
                     element: <Institute />
+                },
+                {
+                    path: '/blogs',
+                    element: <Blogs />
                 },
             ]
         }
