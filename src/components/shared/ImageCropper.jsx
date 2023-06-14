@@ -1,42 +1,41 @@
-import { CameraAlt } from "@mui/icons-material";
 import { Button, Modal } from "@mui/material";
 import React from "react";
-import styled from "styled-components";
 import "cropperjs/dist/cropper.css";
 import { Cropper } from "react-cropper";
 import Compressor from "compressorjs";
-
-const StyledButton = styled(Button)(() => ({ textTransform: "capitalize" }));
+import { useDropzone } from "react-dropzone";
 
 const ImageCropper = ({ children, resizableImage }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [image, setImage] = React.useState(null);
-  const uploadInput = React.useRef(null);
   const cropperRef = React.useRef(null);
   const [error, setError] = React.useState(null);
-
-  // file handler
-  const fileHandler = (e) => {
-    const file = e.target.files[0];
-    if (!file) {
-      return;
-    }
-    const typesArr = ["image/webp", "image/png", "image/jpeg"];
-    if (!typesArr.includes(file.type)) {
-      setError("We accept .png, .jpeg, .webp type");
-      return;
-    }
-    new Compressor(file, {
-      quality: 0.6,
-      convertSize: 1,
-      convertTypes: ["image/webp"],
-      success: (result) => {
-        setImage(result);
-        setIsOpen(true);
-      },
-      error: (err) => console.error(err),
-    });
-  };
+  const { getInputProps, getRootProps } = useDropzone({
+    multiple: false,
+    accept: {
+      'image/png': ['.png', '.jpeg', '.webp']
+    },
+    onDrop: (acceptFiles, rejectFiles) => {
+      if (rejectFiles.length > 0) {
+        setError('File type not supported');
+      } else {
+        new Compressor(acceptFiles[0], {
+          quality: 0.6,
+          convertSize: 1,
+          convertTypes: ["image/webp"],
+          success: (result) => {
+            setImage(result);
+            setIsOpen(true);
+            setError('');
+          },
+          error: (err) => {
+            console.error(err);
+            setError(err);
+          },
+        });
+      }
+    },
+  });
 
   // upload cancel handler
   const cancelHandler = () => {
@@ -60,28 +59,15 @@ const ImageCropper = ({ children, resizableImage }) => {
 
   return (
     <div>
+      <div {...getRootProps()}>
+        <input {...getInputProps()} />
+        {children}
+      </div>
       {error && (
-        <p className="text-center text-red-500 font-medium text-sm mb-2">
+        <p className="text-left pl-3 text-red-500 font-medium text-xs mb-2">
           {error}
         </p>
       )}
-      <input
-        type="file"
-        name="file"
-        className="sr-only"
-        ref={uploadInput}
-        onChange={fileHandler}
-        accept=".png,.jpg,.webp,.jpeg"
-      />
-      <StyledButton
-        size="large"
-        variant="contained"
-        endIcon={<CameraAlt />}
-        onClick={() => uploadInput.current.click()}
-        className="!text-sm font-medium !bg-[#1B3B7B] text-white hover:!bg-[#1B3B7B]"
-      >
-        {children}
-      </StyledButton>
       <Modal open={isOpen} className="grid place-items-center">
         <div className="bg-white rounded-lg px-3 py-5">
           <Cropper
@@ -98,7 +84,8 @@ const ImageCropper = ({ children, resizableImage }) => {
             responsive={true}
             background="#f2f2f2"
             shape="circle"
-            initialAspectRatio={1}
+            // initialAspectRatio={1}
+            initialAspectRatio={16 / 9}
             cropBoxResizable={false}
           />
           <div className="flex gap-x-3 justify-end mt-4">

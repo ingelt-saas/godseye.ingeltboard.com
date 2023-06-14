@@ -7,9 +7,52 @@ import { useState } from "react";
 import PaginationComponent from "../components/shared/PaginationComponent";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
+import { ArrowRightAlt, Delete } from "@mui/icons-material";
+import Image from "../components/shared/Image";
 
-const BlogCard = () => {
-    return (<></>);
+const BlogCard = ({ data, deleteConfirm }) => {
+
+    const { picture, title, text, category } = data;
+
+    return (<div className='rounded-lg shadow-md border border-[#78787840]'>
+        <div className='rounded-lg overflow-hidden md:h-36 xl:h-48'>
+            <Image src={picture} alt={title} className='w-full h-full object-cover' />
+        </div>
+        <div className='px-3 py-4 flex flex-col gap-y-3'>
+            <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{category}</span>
+            <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{title}</h1>
+            <p className='text-sm text-[#0C3C82] font-medium'>{text.length > 100 ? text.split('').slice(0, 100).join('') : text}</p>
+            <div className="flex justify-between">
+                <button className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
+                    Read Post
+                    <ArrowRightAlt fontSize='small' />
+                </button>
+            </div>
+            <div>
+                <Button
+                    variant="contained"
+                    sx={{
+                        color: 'white',
+                        borderRadius: '0.5rem',
+                        border: '2px solid #1B3B7D',
+                        backgroundColor: '#1B3B7D',
+                        textTransform: 'capitalize',
+                        width: '100%',
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            border: '2px solid #1B3B7D',
+                            color: '#1B3B7D',
+                        }
+                    }}
+                    endIcon={<Delete />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        deleteConfirm({ ...data, name: data.title });
+                    }}
+                >Delete</Button>
+            </div>
+        </div>
+    </div>);
 }
 
 
@@ -39,13 +82,13 @@ const Blogs = () => {
         try {
             await blogsApi.delete(deleteConfirm.id);
             setDeleteConfirm(null);
+            refetch();
         } catch (err) {
             toast.error('Sorry! Something went wrong');
         } finally {
             e.target.disabled = false;
         }
     }
-    console.log(data)
 
     return (
         <div className="px-5">
@@ -103,8 +146,8 @@ const Blogs = () => {
                     Add Blog
                 </Button>
             </div>
-            <div className="mt-5">
-                {page === 'add-blog' && <AddBlog />}
+            <div className="mt-10">
+                {page === 'add-blog' && <AddBlog refetch={refetch} />}
                 {page !== 'add-blog' && <div className="md:px-5">
                     {isLoading && <div className="flex justify-center py-5">
                         <CircularProgress />
@@ -115,16 +158,18 @@ const Blogs = () => {
                                 {data?.rows?.map(item =>
                                     <BlogCard
                                         data={item}
-                                        key={item}
+                                        key={item.id}
                                         deleteConfirm={setDeleteConfirm}
                                     />
                                 )}
                             </div>
-                            <PaginationComponent
-                                currentPage={pagination.page}
-                                onPageChange={(page) => setPagination({ ...pagination, page: page })}
-                                totalPages={Math.ceil(data?.count / pagination.rows)}
-                            />
+                            <div className="flex justify-center py-10">
+                                <PaginationComponent
+                                    currentPage={pagination.page}
+                                    onPageChange={(page) => setPagination({ ...pagination, page: page })}
+                                    totalPages={Math.ceil(data?.count / pagination.rows)}
+                                />
+                            </div>
                         </div>
                         :
                         <Alert icon={false} severity="warning" className="mx-auto w-fit">No Blog Found</Alert>
