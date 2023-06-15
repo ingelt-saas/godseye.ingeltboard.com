@@ -13,16 +13,19 @@ import moment from "moment/moment";
 
 const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
 
-    const { picture, title, text, category } = data;
+    const { picture, title, text, category, createdAt } = data;
 
     return (<div className='rounded-lg shadow-md border border-[#78787840]'>
         <div className='rounded-lg overflow-hidden md:h-36 xl:h-48'>
             <Image src={picture} alt={title} className='w-full h-full object-cover' />
         </div>
         <div className='px-3 py-4 flex flex-col gap-y-3'>
-            <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{category}</span>
+            <div className="flex justify-between items-center">
+                <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{category}</span>
+                <span className="text-xs font-medium">{moment(createdAt).format('lll')}</span>
+            </div>
             <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{title}</h1>
-            <p className='text-sm text-[#0C3C82] font-medium'>{text.length > 100 ? text.split('').slice(0, 100).join('') : text}</p>
+            <p className='text-sm text-[#0C3C82] font-medium'>{text.length > 100 ? text.split('').slice(0, 100).join('') + '...' : text}</p>
             <div className="flex justify-between">
                 <button onClick={() => viewBlog(data)} className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
                     Read Post
@@ -157,7 +160,7 @@ const Blogs = () => {
                     </div>}
                     {!isLoading && (Array.isArray(data?.rows) && data?.rows?.length > 0 ?
                         <div>
-                            <div className="grid grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                 {data?.rows?.map(item =>
                                     <BlogCard
                                         data={item}
@@ -180,6 +183,7 @@ const Blogs = () => {
                     )}
                 </div>}
             </div>
+
             <DeleteConfirmModal
                 close={() => setDeleteConfirm(null)}
                 open={Boolean(deleteConfirm)}
