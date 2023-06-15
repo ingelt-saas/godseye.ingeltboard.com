@@ -96,7 +96,7 @@ const UniversityItem = ({ university, deleteConfirm }) => {
 
             {/* 4th div */}
             <div className='mb-2'>
-                <Image src={logo} alt={name} className={'h-auto w-11 inline mb-1'} />
+                <Image src={logo} alt={name} className={'h-auto w-11 rounded-md inline mb-1'} />
                 <p className="pl-4 font-medium pr-3 text-[#0C3C82] inline">{name}</p>
             </div>
 

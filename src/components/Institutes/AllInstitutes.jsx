@@ -36,7 +36,7 @@ const AllInstitutes = () => {
                             institute={item}
                         />
                     )}
-                    <div className="">
+                    <div className="flex justify-center">
                         <PaginationComponent
                             currentPage={pagination.page}
                             onPageChange={(page) => setPagination({ ...pagination, page: page })}
