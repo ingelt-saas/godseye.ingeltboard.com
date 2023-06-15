@@ -1,4 +1,4 @@
-import { Alert, Button, CircularProgress } from "@mui/material";
+import { Alert, Button, CircularProgress, Modal } from "@mui/material";
 import { useSearchParams } from "react-router-dom";
 import AddBlog from "../components/Blogs/AddBlog";
 import { useQuery } from '@tanstack/react-query';
@@ -7,10 +7,11 @@ import { useState } from "react";
 import PaginationComponent from "../components/shared/PaginationComponent";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
-import { ArrowRightAlt, Delete } from "@mui/icons-material";
+import { ArrowRightAlt, Close, Delete } from "@mui/icons-material";
 import Image from "../components/shared/Image";
+import moment from "moment/moment";
 
-const BlogCard = ({ data, deleteConfirm }) => {
+const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
 
     const { picture, title, text, category } = data;
 
@@ -23,10 +24,11 @@ const BlogCard = ({ data, deleteConfirm }) => {
             <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{title}</h1>
             <p className='text-sm text-[#0C3C82] font-medium'>{text.length > 100 ? text.split('').slice(0, 100).join('') : text}</p>
             <div className="flex justify-between">
-                <button className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
+                <button onClick={() => viewBlog(data)} className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
                     Read Post
                     <ArrowRightAlt fontSize='small' />
                 </button>
+                <span>{' '}</span>
             </div>
             <div>
                 <Button
@@ -63,6 +65,7 @@ const Blogs = () => {
     const [pagination, setPagination] = useState({ page: 1, rows: 20 });
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [viewBlog, setViewBlog] = useState(null);
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['blogs', pagination],
@@ -160,6 +163,7 @@ const Blogs = () => {
                                         data={item}
                                         key={item.id}
                                         deleteConfirm={setDeleteConfirm}
+                                        viewBlog={setViewBlog}
                                     />
                                 )}
                             </div>
@@ -183,6 +187,26 @@ const Blogs = () => {
                 data={deleteConfirm}
                 confirmHandler={deleteBlog}
             />
+
+            {/* blog details modal */}
+            <Modal open={Boolean(viewBlog)} onClose={() => setViewBlog(null)} className="grid place-items-center">
+                <div className="rounded-lg shadow-xl bg-white px-3 sm:px-5 py-7 w-11/12 md:max-w-[600px] relative">
+                    <button onClick={() => setViewBlog(null)} className="bg-[#0C3C82] text-white w-8 h-8 grid place-items-center rounded-full absolute top-3 right-3">
+                        <Close />
+                    </button>
+                    <div className="w-full h-auto rounded-lg overflow-hidden">
+                        <Image src={viewBlog?.picture} alt={viewBlog?.title} className={'w-full h-auto'} />
+                    </div>
+                    <div className=" flex flex-col gap-y-4 mt-4">
+                        <div className="flex items-center justify-between">
+                            <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{viewBlog?.category}</span>
+                            <span className="text-sm">{moment(viewBlog?.createdAt).format('lll')}</span>
+                        </div>
+                        <h1 className='text-2xl text-[#0C3C82] font-medium leading-none'>{viewBlog?.title}</h1>
+                        <p className='text-sm text-black opacity-75 font-medium'>{viewBlog?.text}</p>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

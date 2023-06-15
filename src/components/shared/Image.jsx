@@ -14,6 +14,7 @@ const Image = ({ src, alt, className }) => {
     }, [src]);
     return !url ? <span className={`${className} shadow`}></span> :
         <img
+            draggable={false}
             src={url}
             alt={alt}
             className={className}
