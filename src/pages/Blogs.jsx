@@ -10,6 +10,7 @@ import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import { ArrowRightAlt, Close, Delete } from "@mui/icons-material";
 import Image from "../components/shared/Image";
 import moment from "moment/moment";
+import Categories from "../components/Blogs/Categories";
 
 const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
 
@@ -151,10 +152,38 @@ const Blogs = () => {
                 >
                     Add Blog
                 </Button>
+                <Button
+                    onClick={() => setSearch({ page: 'categories' }, { replace: true })}
+                    sx={{
+                        bgColor: 'transparent',
+                        color: page === 'categories' ? 'black' : '#00000099',
+                        textTransform: 'capitalize',
+                        fontWeight: 600,
+                        padding: '0.8rem 1.5rem',
+                        fontSize: '0.9rem',
+                        position: 'relative',
+                        '&:hover': {
+                            bgColor: 'transparent !important',
+                        },
+                        '&:after': {
+                            content: '""',
+                            height: '4px',
+                            width: '100%',
+                            position: 'absolute',
+                            bottom: '-4px',
+                            left: '0',
+                            backgroundColor: page === 'categories' ? 'black' : 'transparent',
+                        }
+                    }}
+                >
+                    Categories
+                </Button>
             </div>
             <div className="mt-10">
                 {page === 'add-blog' && <AddBlog refetch={refetch} />}
-                {page !== 'add-blog' && <div className="md:px-5">
+                {page === 'categories' && <Categories />}
+
+                {(page !== 'add-blog' && page !== 'categories') && <div className="md:px-5">
                     {isLoading && <div className="flex justify-center py-5">
                         <CircularProgress />
                     </div>}
