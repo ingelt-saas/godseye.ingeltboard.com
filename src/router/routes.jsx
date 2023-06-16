@@ -16,7 +16,7 @@ const Routes = () => {
 
     const { loading, inGelt } = useContext(AdminContext);
 
-    const router = !inGelt ? createBrowserRouter([
+    const router = inGelt ? createBrowserRouter([
         {
             path: '/',
             element: <PanelLayout />,
