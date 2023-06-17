@@ -10,10 +10,12 @@ import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import { ArrowRightAlt, Close, Delete } from "@mui/icons-material";
 import Image from "../components/shared/Image";
 import moment from "moment/moment";
+import Categories from "../components/Blogs/Categories";
+import parse from 'html-react-parser';
 
 const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
 
-    const { picture, title, text, category, createdAt } = data;
+    const { picture, title, textContent, category, createdAt } = data;
 
     return (<div className='rounded-lg shadow-md border border-[#78787840]'>
         <div className='rounded-lg overflow-hidden md:h-36 xl:h-48'>
@@ -25,7 +27,7 @@ const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
                 <span className="text-xs font-medium">{moment(createdAt).format('lll')}</span>
             </div>
             <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{title}</h1>
-            <p className='text-sm text-[#0C3C82] font-medium'>{text.length > 100 ? text.split('').slice(0, 100).join('') + '...' : text}</p>
+            <p className='text-sm text-[#0C3C82] font-medium'>{textContent.length > 100 ? textContent.split('').slice(0, 100).join('') + '...' : textContent}</p>
             <div className="flex justify-between">
                 <button onClick={() => viewBlog(data)} className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
                     Read Post
@@ -151,10 +153,38 @@ const Blogs = () => {
                 >
                     Add Blog
                 </Button>
+                <Button
+                    onClick={() => setSearch({ page: 'categories' }, { replace: true })}
+                    sx={{
+                        bgColor: 'transparent',
+                        color: page === 'categories' ? 'black' : '#00000099',
+                        textTransform: 'capitalize',
+                        fontWeight: 600,
+                        padding: '0.8rem 1.5rem',
+                        fontSize: '0.9rem',
+                        position: 'relative',
+                        '&:hover': {
+                            bgColor: 'transparent !important',
+                        },
+                        '&:after': {
+                            content: '""',
+                            height: '4px',
+                            width: '100%',
+                            position: 'absolute',
+                            bottom: '-4px',
+                            left: '0',
+                            backgroundColor: page === 'categories' ? 'black' : 'transparent',
+                        }
+                    }}
+                >
+                    Categories
+                </Button>
             </div>
             <div className="mt-10">
                 {page === 'add-blog' && <AddBlog refetch={refetch} />}
-                {page !== 'add-blog' && <div className="md:px-5">
+                {page === 'categories' && <Categories />}
+
+                {(page !== 'add-blog' && page !== 'categories') && <div className="md:px-5">
                     {isLoading && <div className="flex justify-center py-5">
                         <CircularProgress />
                     </div>}
@@ -194,7 +224,7 @@ const Blogs = () => {
 
             {/* blog details modal */}
             <Modal open={Boolean(viewBlog)} onClose={() => setViewBlog(null)} className="grid place-items-center">
-                <div className="rounded-lg shadow-xl bg-white px-3 sm:px-5 py-7 w-11/12 md:max-w-[600px] relative">
+                <div className="rounded-lg shadow-xl bg-white px-3 sm:px-5 py-7 w-11/12 md:max-w-[600px] relative max-h-[90vh] overflow-y-auto">
                     <button onClick={() => setViewBlog(null)} className="bg-[#0C3C82] text-white w-8 h-8 grid place-items-center rounded-full absolute top-3 right-3">
                         <Close />
                     </button>
@@ -207,7 +237,10 @@ const Blogs = () => {
                             <span className="text-sm">{moment(viewBlog?.createdAt).format('lll')}</span>
                         </div>
                         <h1 className='text-2xl text-[#0C3C82] font-medium leading-none'>{viewBlog?.title}</h1>
-                        <p className='text-sm text-black opacity-75 font-medium'>{viewBlog?.text}</p>
+                        <div className='text-sm text-black opacity-75 font-medium'>
+                            {viewBlog?.content && parse(viewBlog?.content)}
+                            {/* {viewBlog?.content} */}
+                        </div>
                     </div>
                 </div>
             </Modal>
