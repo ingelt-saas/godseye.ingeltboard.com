@@ -6,14 +6,25 @@ import { Button, TextField, FormControl, InputLabel, Select, MenuItem } from '@m
 import { Textarea } from "@mui/joy";
 import ImageCropper from "../shared/ImageCropper";
 import blogsApi from "../../api/blogs";
+import { useQuery } from "@tanstack/react-query";
+import categoryApi from "../../api/category";
+import RichEditor from "./RichEditor/RichEditor";
 
 const AddBlog = ({ refetch }) => {
 
-    const [error, setError] = useState('');
+    const [error, setFormError] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const { register, handleSubmit, control, reset, resetField, formState: { errors } } = useForm();
+    const { register, handleSubmit, control, reset, setValue, getValues, clearErrors, setError, resetField, formState: { errors } } = useForm();
+
+    const { data: categories = [], } = useQuery({
+        queryKey: ['categories'],
+        queryFn: async () => {
+            const res = await categoryApi.read();
+            return res.data;
+        }
+    });
 
     const blogAddHandler = async (data) => {
 
@@ -30,7 +41,7 @@ const AddBlog = ({ refetch }) => {
         }
 
         setLoading(true);
-        setError('');
+        setFormError('');
         try {
             await blogsApi.create(formData);
             reset();
@@ -39,7 +50,7 @@ const AddBlog = ({ refetch }) => {
             setSelectedImage(null);
             toast.success('Blog added successfully');
         } catch (err) {
-            setError('Sorry! Something went wrong');
+            setFormError('Sorry! Something went wrong');
         } finally {
             setLoading(false);
         }
@@ -69,28 +80,20 @@ const AddBlog = ({ refetch }) => {
                         />
                         {errors?.title && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.title?.message}</p>}
                     </div>
-                    <div className="">
-                        <Controller
-                            name="text"
-                            control={control}
-                            rules={{ required: 'Description is required' }}
-                            render={({ field }) => <Textarea
-                                placeholder="Description...."
-                                {...field}
-                                minRows={4}
-                                maxRows={6}
-                                defaultValue={''}
-                                endDecorator={
-                                    <small className="ml-auto">{field.value?.length || 0} character(s)</small>
+                    <div className="col-span-2">
+                        <RichEditor
+                            content={getValues('content')}
+                            changeHandler={(html, text) => {
+                                if (text.trim()) {
+                                    setValue('content', html);
+                                    setValue('textContent', text.trim());
+                                    clearErrors('content');
+                                } else {
+                                    setError('content', { type: 'custom', message: 'Content is required' });
                                 }
-                                sx={{
-                                    '&:before': {
-                                        boxShadow: 'none !important',
-                                    },
-                                }}
-                            />}
+                            }}
                         />
-                        {errors?.description && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.description?.message}</p>}
+                        {errors?.content && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.content?.message}</p>}
                     </div>
                     <div className="">
                         <ImageCropper
@@ -111,15 +114,18 @@ const AddBlog = ({ refetch }) => {
                             name="category"
                             control={control}
                             rules={{ required: 'Category is required' }}
-                            render={({ field }) =>
+                            render={({ field: { name, onChange, ref, value } }) =>
                                 <FormControl variant="standard" fullWidth>
                                     <InputLabel id="demo-simple-select-standard-label" className="!pl-3 !text-base">Category</InputLabel>
                                     <Select
-                                        {...field}
+                                        name={name}
+                                        ref={ref}
+                                        onChange={onChange}
+                                        value={value || ''}
                                         labelId="demo-simple-select-standard-label"
                                         id="demo-simple-select-standard"
                                         label="Category"
-                                        InputLabelProps={{ className: '!text-base !pl-3' }}
+                                        // InputLabelProps={{ className: '!text-base !pl-3' }}
                                         sx={{
                                             '& .MuiInput-underline:after': {
                                                 borderColor: '#001E43 !important',
@@ -129,14 +135,12 @@ const AddBlog = ({ refetch }) => {
                                             }
                                         }}
                                         defaultValue={''}
+                                        MenuProps={{ sx: { maxHeight: '50vh' } }}
                                     >
                                         <MenuItem value="">
                                             <em>None</em>
                                         </MenuItem>
-                                        <MenuItem value='Category One'>Category One</MenuItem>
-                                        <MenuItem value='Category Two'>Category Two</MenuItem>
-                                        <MenuItem value='Category Three'>Category Three</MenuItem>
-                                        <MenuItem value='Category Four'>Category Four</MenuItem>
+                                        {categories.map(i => <MenuItem key={i.id} value={i.name}>{i.name}</MenuItem>)}
                                     </Select>
                                 </FormControl>
                             }

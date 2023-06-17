@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@lexical/react": "^0.11.1",
     "@mui/icons-material": "^5.11.16",
     "@mui/joy": "^5.0.0-alpha.83",
     "@mui/material": "^5.13.4",
@@ -20,6 +21,7 @@
     "axios": "^1.4.0",
     "compressorjs": "^1.2.1",
     "js-cookie": "^3.0.5",
+    "lexical": "^0.11.1",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-cropper": "^2.3.3",
