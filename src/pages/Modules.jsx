@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import SearchBar from '../components/shared/SearchBar';
 import { Alert, Box, Button, CircularProgress, TablePagination, Typography } from '@mui/material';
 
 // assets 
 import moduleImg from '../assets/module.svg';
-import { useEffect } from 'react';
 import moduleApi from '../api/modules';
 import Image from '../components/shared/Image';
 import AudioModal from '../components/shared/AudioModal';
 import VideoModal from '../components/shared/VideoModal';
 import getFile from '../api/getFile';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Delete } from '@mui/icons-material';
+import DeleteConfirmModal from '../components/shared/DeleteConfirmModal';
 
 const Modules = () => {
 
@@ -19,6 +20,8 @@ const Modules = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [pagination, setPagination] = useState({ page: 0, rows: 10 });
     const [selectedFile, setSelectedFile] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const navigate = useNavigate();
 
     const { data: modules, isLoading, refetch } = useQuery({
         queryKey: ['modules', pagination, activeTab, searchQuery],
@@ -75,6 +78,23 @@ const Modules = () => {
         e.preventDefault();
         setSearchQuery(e.target.search.value);
         setPagination({ page: 0, rows: 5 });
+    }
+
+    // delete handler
+    const deleteModule = async (e) => {
+        if (!deleteConfirm) {
+            return;
+        }
+        e.target.disabled = true;
+        try {
+            await moduleApi.delete(deleteConfirm.id);
+            setDeleteConfirm(null);
+            refetch();
+        } catch (err) {
+            console.error(err)
+        } finally {
+            e.target.disabled = false;
+        }
     }
 
     return (
@@ -187,11 +207,11 @@ const Modules = () => {
             {!isLoading && (Array.isArray(modules?.rows) && modules?.rows?.length > 0 ? <Box className='mt-5'>
                 <div className="grid 2xl:grid-cols-4 xl:grid-cols-3 md:grid-cols-2 gap-y-5 pt-10">
                     {modules?.rows.map((item, index) => (
-                        <div onClick={() => handleView(item.file)} className="p-3 bg-white flex flex-col rounded-xl h-full shadow-[0px_10px_36px_rgba(0,0,0,0.16),0px_0px_0px_1px_rgba(0,0,0,0.06)] scale-95 hover:scale-100 duration-200 transition-transform cursor-pointer" key={index}>
+                        <div onClick={() => item.file && handleView(item.file)} className="p-3 bg-white flex flex-col rounded-xl h-full shadow-[0px_10px_36px_rgba(0,0,0,0.16),0px_0px_0px_1px_rgba(0,0,0,0.06)] scale-95 hover:scale-100 duration-200 transition-transform cursor-pointer" key={index}>
                             <div className='rounded-2xl h-44 overflow-hidden'>
                                 <Image src={item.thumbnail} alt={item.name} className='w-full h-full object-cover' />
                             </div>
-                            <div className='mt-5 flex-col flex flex-1'>
+                            <div className='mt-5 flex-col gap-y-3 flex flex-1'>
                                 <h4 className='flex justify-between gap-x-3 items-start'>
                                     <span className='text-lg font-semibold text-[#00285A]'>{item.name}</span>
                                     {item.subject === 'writing' && <span className='capitalize text-sm font-medium bg-[#85E1ED33] rounded-full text-[#355A5F] py-1 px-4 shadow-md'>{item.subject}</span>}
@@ -199,10 +219,10 @@ const Modules = () => {
                                     {item.subject === 'reading' && <span className='capitalize text-sm font-medium bg-[#0064E133] rounded-full text-[#0064E1] py-1 px-4 shadow-md'>{item.subject}</span>}
                                     {item.subject === 'speaking' && <span className='capitalize text-sm font-medium bg-[#E19AF233] rounded-full text-[#5A3E61] py-1 px-4 shadow-md'>{item.subject}</span>}
                                 </h4>
-                                <p className='text-sm mt-3 flex-1'>
+                                <p className='text-sm flex-1'>
                                     {item.description?.length > 90 ? item.description.split('').slice(0, 90).join('') + '...' : item.description}
                                 </p>
-                                <p className='flex items-center justify-between mt-3'>
+                                <p className='flex items-center justify-between'>
                                     <span className='flex items-center text-[#00285A] gap-x-2 text-sm'>
                                         <svg
                                             width={16}
@@ -239,6 +259,45 @@ const Modules = () => {
                                         Views
                                     </span>
                                 </p>
+
+                                <div className='flex gap-x-3'>
+                                    <Button
+                                        variant="outlined"
+                                        sx={{
+                                            color: '#1B3B7D',
+                                            borderRadius: '7px',
+                                            border: '2px solid #1B3B7D',
+                                            textTransform: 'capitalize',
+                                            width: '100%',
+                                            '&:hover': {
+                                                border: '2px solid #1B3B7D',
+                                            }
+                                        }}
+                                        // endIcon={<Delete />}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/modules/add?id=${item.id}`);
+                                        }}
+                                    >Update</Button>
+                                    <Button
+                                        variant="outlined"
+                                        sx={{
+                                            color: '#1B3B7D',
+                                            borderRadius: '7px',
+                                            border: '2px solid #1B3B7D',
+                                            textTransform: 'capitalize',
+                                            width: '100%',
+                                            '&:hover': {
+                                                border: '2px solid #1B3B7D',
+                                            }
+                                        }}
+                                        endIcon={<Delete />}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteConfirm(item);
+                                        }}
+                                    >Delete</Button>
+                                </div>
                             </div>
                         </div>
                     ))
@@ -278,6 +337,15 @@ const Modules = () => {
             ) : (
                 <VideoModal file={selectedFile?.link} showPopup={Boolean(selectedFile)} closePopup={() => setSelectedFile(null)} />
             )}
+
+            {/* delete confirm modal */}
+            <DeleteConfirmModal
+                close={() => setDeleteConfirm(null)}
+                confirmHandler={deleteModule}
+                data={deleteConfirm}
+                name={'module'}
+                open={Boolean(deleteConfirm)}
+            />
 
         </Box>
     );

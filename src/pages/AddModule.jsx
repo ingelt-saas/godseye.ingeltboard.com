@@ -1,10 +1,14 @@
 import { Textarea } from "@mui/joy";
-import { Button, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactPlayer from "react-player";
 import { toast } from "react-toastify";
 import modulesApi from "../api/modules";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import Image from "../components/shared/Image";
+import getFile from "../api/getFile";
 
 const ModuleThumbnail = ({ setThumbnail, setThumbnailError }) => {
 
@@ -32,8 +36,10 @@ const AddModule = () => {
     const [selectedThumbnail, setSelectedThumbnail] = useState(null);
     const [moduleError, setModuleError] = useState('');
     const [thumbnailError, setThumbnailError] = useState('');
-    const [description, setDescription] = useState('');
-    const [subject, setSubject] = useState('');
+    const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null });
+    const [errors, setErrors] = useState({});
+    const [search] = useSearchParams();
+    const moduleId = search.get('id');
 
     const onDrop = useCallback((acceptFile, rejectFile) => {
         if (rejectFile.length > 0) {
@@ -46,6 +52,7 @@ const AddModule = () => {
 
     const { getInputProps, getRootProps } = useDropzone({ onDrop, accept: { 'video/*': [] }, multiple: false });
 
+    // video duration
     const getVideoDuration = (file) => new Promise((resolve) => {
         const video = document.createElement('video');
         video.src = URL.createObjectURL(file)
@@ -54,40 +61,66 @@ const AddModule = () => {
         }
     });
 
+    // add module handler 
     const addModuleHandle = async (e) => {
 
-        if (!selectedModule) {
-            toast.error('Select module video');
-            return;
-        }
+        const newErrors = {};
+        const currentDateTime = new Date();
+        const releaseDate = new Date(moduleData.releaseDate);
+
         if (!selectedThumbnail) {
-            toast.error('Select module thumbnail');
-            return;
+            newErrors.thumbnail = 'Module thumbnail is required';
         }
-        if (!description) {
-            toast.error('Enter module description');
-            return;
+        if (!moduleData.description) {
+            newErrors.description = 'Module description is required';
         }
-        if (!subject) {
-            toast.error('Select subject');
-            return;
+        if (!moduleData.name) {
+            newErrors.name = 'Module name is required';
         }
+        if (!moduleData.subject) {
+            newErrors.subject = 'Module subject is required';
+        }
+        if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
+            newErrors.releaseDate = 'Release date should be greater than the current date and time';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        } else {
+            if (!selectedModule && !moduleData.releaseDate) {
+                setErrors({ formError: 'Please select module release date' });
+                return;
+            } else {
+                setErrors({});
+            }
+        }
+
+
+
         e.target.disabled = true;
-        const duration = await getVideoDuration(selectedModule);
         const formData = new FormData();
-        formData.append('file', selectedModule);
+
+        if (selectedModule) {
+            const duration = await getVideoDuration(selectedModule);
+            formData.append('file', selectedModule);
+            formData.append('duration', duration);
+        }
+
         formData.append('thumbnail', selectedThumbnail);
-        formData.append('subject', subject);
-        formData.append('description', description);
-        formData.append('duration', duration);
+        formData.append('subject', moduleData.subject);
+        formData.append('name', moduleData.name);
+        formData.append('description', moduleData.description);
+        if (moduleData.releaseDate) {
+            formData.append('releaseDate', moduleData.releaseDate);
+        }
 
         try {
             await modulesApi.create(formData);
             toast.success('Module added successfully');
             setSelectedModule(null);
             setSelectedThumbnail(null);
-            setDescription('');
-            setSubject('');
+            setModuleData({ name: '', description: '', subject: '', releaseDate: null });
         } catch (err) {
             toast.error('Sorry! Something went wrong');
         } finally {
@@ -96,6 +129,92 @@ const AddModule = () => {
 
     }
 
+    // const update module handler
+    const updateModule = async (e) => {
+
+        const newErrors = {};
+        const currentDateTime = new Date();
+        const releaseDate = new Date(moduleData.releaseDate);
+
+        if (!selectedThumbnail) {
+            newErrors.thumbnail = 'Module thumbnail is required';
+        }
+        if (!moduleData.description) {
+            newErrors.description = 'Module description is required';
+        }
+        if (!moduleData.name) {
+            newErrors.name = 'Module name is required';
+        }
+        if (!moduleData.subject) {
+            newErrors.subject = 'Module subject is required';
+        }
+        if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
+            newErrors.releaseDate = 'Release date should be greater than the current date and time';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        } else {
+            if (!selectedModule && !moduleData.releaseDate) {
+                setErrors({ formError: 'Please select module release date' });
+                return;
+            } else {
+                setErrors({});
+            }
+        }
+
+
+
+        e.target.disabled = true;
+        const toastId = toast.loading('Updating...');
+        const formData = new FormData();
+
+        if (selectedModule && typeof selectedModule === 'object') {
+            const duration = await getVideoDuration(selectedModule);
+            formData.append('file', selectedModule);
+            formData.append('duration', duration);
+        }
+
+        if (selectedThumbnail && typeof selectedThumbnail === 'object') {
+            formData.append('thumbnail', selectedThumbnail);
+        }
+
+        formData.append('subject', moduleData.subject);
+        formData.append('name', moduleData.name);
+        formData.append('description', moduleData.description);
+        if (moduleData.releaseDate) {
+            formData.append('releaseDate', moduleData.releaseDate);
+        }
+
+        try {
+            await modulesApi.update(moduleId, formData);
+            toast.success('Module update successfully');
+        } catch (err) {
+            toast.error('Sorry! Something went wrong');
+        } finally {
+            toast.dismiss(toastId);
+            e.target.disabled = false;
+        }
+
+    }
+
+    useEffect(() => {
+        if (moduleId) {
+            modulesApi.readById(moduleId)
+                .then(res => {
+                    const getModule = res.data;
+                    setModuleData({ ...getModule, releaseDate: new Date(getModule.releaseDate).toISOString().slice(0, 16) });
+                    if (getModule?.thumbnail) {
+                        setSelectedThumbnail(getModule.thumbnail);
+                    }
+                    if (getModule?.file) {
+                        setSelectedModule(getModule.file);
+                    }
+                })
+        }
+    }, [moduleId]);
+
     return (
         <div className="px-5">
             <h1 className="pb-2 border-b text-3xl font-medium">Add Module</h1>
@@ -103,7 +222,7 @@ const AddModule = () => {
                 <div className="md:w-1/2">
                     <div className="w-full">
                         {selectedModule && <ReactPlayer
-                            url={URL.createObjectURL(selectedModule)}
+                            url={typeof selectedModule === 'object' ? URL.createObjectURL(selectedModule) : getFile(selectedModule).then(res => res.data)}
                             style={{ borderRadius: '10px', overflow: 'hidden' }}
                             playing={false}
                             width="100%"
@@ -128,38 +247,56 @@ const AddModule = () => {
                         {moduleError && <p className="text-sm mt-3 font-medium text-center text-red-500 ">{moduleError}</p>}
                     </div>
                     <div className="w-full mt-10">
-                        {selectedThumbnail && <img src={URL.createObjectURL(selectedThumbnail)} alt='' className='w-full h-auto' />}
+                        {selectedThumbnail && typeof selectedThumbnail === 'string' && <Image src={selectedThumbnail} alt='' className={'w-full h-auto'} />}
+                        {selectedThumbnail && typeof selectedThumbnail === 'object' && <img src={URL.createObjectURL(selectedThumbnail)} alt='' className='w-full h-auto' />}
                         {!selectedThumbnail && <ModuleThumbnail
                             setThumbnail={setSelectedThumbnail}
                             setThumbnailError={setThumbnailError}
                         />}
                         {thumbnailError && <p className="text-sm mt-3 font-medium text-center text-red-500 ">{thumbnailError}</p>}
+                        {errors?.thumbnail && <span className="mt-1 text-xs text-red-500">{errors.thumbnail}</span>}
                     </div>
                 </div>
-                <div className="md:w-1/2">
-                    <div>
+                <div className="md:w-1/2 max-md:pb-10">
+                    <div className="flex flex-col gap-y-5">
+
+                        <div className="">
+                            <TextField
+                                fullWidth
+                                label='Name'
+                                variant="outlined"
+                                size="small"
+                                value={moduleData.name}
+                                type="text"
+                                onChange={(e) => setModuleData({ ...moduleData, name: e.target.value })}
+                            />
+                            {errors?.name && <span className="mt-1 text-xs text-red-500">{errors.name}</span>}
+                        </div>
+
                         <div>
                             <Textarea
                                 placeholder="Description...."
-                                value={description}
-                                onChange={(event) => setDescription(event.target.value)}
+                                value={moduleData.description}
+                                onChange={(e) => setModuleData({ ...moduleData, description: e.target.value })}
                                 minRows={2}
                                 maxRows={4}
                                 endDecorator={
-                                    <small className="ml-auto">{description.length} character(s)</small>
+                                    <small className="ml-auto">{moduleData.description.length} character(s)</small>
                                 }
                                 sx={{ minWidth: 300 }}
                             />
+                            {errors?.description && <span className="mt-1 text-xs text-red-500">{errors.description}</span>}
                         </div>
-                        <div className="mt-5">
+
+                        <div className="">
                             <FormControl fullWidth size="small">
                                 <InputLabel id="demo-select-small-label">Subject</InputLabel>
                                 <Select
                                     labelId="demo-select-small-label"
                                     id="demo-select-small"
-                                    value={subject}
+                                    value={moduleData.subject}
                                     label="Subject"
-                                    onChange={(e) => setSubject(e.target.value)}
+                                    onChange={(e) => setModuleData({ ...moduleData, subject: e.target.value })}
                                 >
                                     <MenuItem value='All'>All</MenuItem>
                                     <MenuItem value='Reading'>Reading</MenuItem>
@@ -168,8 +305,34 @@ const AddModule = () => {
                                     <MenuItem value='Listening'>Listening</MenuItem>
                                 </Select>
                             </FormControl>
+                            {errors?.subject && <span className="mt-1 text-xs text-red-500">{errors.subject}</span>}
                         </div>
-                        <div className="mt-3 text-end">
+
+                        <div className="">
+                            <TextField
+                                fullWidth
+                                label='Release Date'
+                                variant="outlined"
+                                size="small"
+                                value={moduleData.releaseDate || ''}
+                                InputLabelProps={{ shrink: true }}
+                                type="datetime-local"
+                                onChange={(e) => setModuleData({ ...moduleData, releaseDate: e.target.value })}
+                                InputProps={{
+                                    inputProps: { min: new Date().toISOString().slice(0, 16) },
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            {/* Add any desired icon or text */}
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            {errors?.releaseDate && <span className="mt-1 text-xs text-red-500">{errors.releaseDate}</span>}
+                        </div>
+
+                        {errors?.formError && <p className="mt-1 text-xs text-center text-red-500">{errors.formError}</p>}
+
+                        <div className="text-end">
                             <Button
                                 variant="contained"
                                 sx={{
@@ -180,15 +343,15 @@ const AddModule = () => {
                                         backgroundColor: '#1B3B7D'
                                     }
                                 }}
-                                onClick={addModuleHandle}
+                                onClick={moduleId ? updateModule : addModuleHandle}
                             >
-                                Add Module
+                                {moduleId ? 'Update Module' : 'Add Module'}
                             </Button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 
