@@ -1,9 +1,10 @@
-import { Button, TextField } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import universityApi from "../../api/university";
 import { toast } from "react-toastify";
+import areaOfInterestList from "./AreaOfInterestData";
 
 const TextInputField = ({ label, name, defaultValue, validation, Form, type }) => {
     const { register, formState: { errors } } = Form;
@@ -40,7 +41,7 @@ const AddUniversity = ({ refetch }) => {
     const [loading, setLoading] = useState(false);
 
     const Form = useForm();
-    const { handleSubmit, reset } = Form;
+    const { handleSubmit, reset, control, formState: { errors } } = Form;
     const { getRootProps, getInputProps } = useDropzone({
         multiple: false,
         accept: {
@@ -120,7 +121,9 @@ const AddUniversity = ({ refetch }) => {
         },
     ];
 
+    // add university handler
     const universityHandler = async (data) => {
+
         if (!selectedLogo) {
             setError('Logo is required');
             return;
@@ -160,6 +163,46 @@ const AddUniversity = ({ refetch }) => {
                             Form={Form}
                         />
                     )}
+                    <div>
+                        <Controller
+                            name='areaOfInterest'
+                            control={control}
+                            rules={{ required: 'Area of interest is required' }}
+                            render={({ field: { value, onChange } }) => <FormControl variant="standard" fullWidth>
+                                <InputLabel
+                                    id="demo-simple-select-standard-label"
+                                    className="!text-sm !pl-3"
+                                    sx={{
+                                        '&.Mui-focused': {
+                                            color: '#001E43 !important',
+                                        }
+                                    }}
+                                >Area Of Interest</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-standard-label"
+                                    id="demo-simple-select-standard"
+                                    value={value || ''}
+                                    onChange={onChange}
+                                    sx={{
+                                        '& .MuiInput-underline:after': {
+                                            borderColor: '#001E43 !important',
+                                        },
+                                        '&:after': {
+                                            borderBottom: '2px solid #001E43 !important',
+                                            // color: ' !important',
+                                        }
+                                    }}
+                                    label="Area of Interest"
+                                    MenuProps={{ sx: { maxHeight: '70vh' } }}
+                                >
+                                    <MenuItem value={''}><em>None</em></MenuItem>
+                                    <MenuItem value={'All'}>All</MenuItem>
+                                    {areaOfInterestList.map(item => <MenuItem value={item.name} key={item.name}>{item.name}</MenuItem>)}
+                                </Select>
+                            </FormControl>}
+                        />
+                        {errors?.areaOfInterest && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.areaOfInterest?.message}</p>}
+                    </div>
                     <div className="">
                         <div {...getRootProps()}>
                             <input {...getInputProps()} />

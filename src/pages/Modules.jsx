@@ -214,10 +214,10 @@ const Modules = () => {
                             <div className='mt-5 flex-col gap-y-3 flex flex-1'>
                                 <h4 className='flex justify-between gap-x-3 items-start'>
                                     <span className='text-lg font-semibold text-[#00285A]'>{item.name}</span>
-                                    {item.subject === 'writing' && <span className='capitalize text-sm font-medium bg-[#85E1ED33] rounded-full text-[#355A5F] py-1 px-4 shadow-md'>{item.subject}</span>}
-                                    {item.subject === 'listening' && <span className='capitalize text-sm font-medium bg-[#FF898933] rounded-full text-[#663737] py-1 px-4 shadow-md'>{item.subject}</span>}
-                                    {item.subject === 'reading' && <span className='capitalize text-sm font-medium bg-[#0064E133] rounded-full text-[#0064E1] py-1 px-4 shadow-md'>{item.subject}</span>}
-                                    {item.subject === 'speaking' && <span className='capitalize text-sm font-medium bg-[#E19AF233] rounded-full text-[#5A3E61] py-1 px-4 shadow-md'>{item.subject}</span>}
+                                    {item.subject === 'Writing' && <span className='capitalize text-sm font-medium bg-[#85E1ED33] rounded-full text-[#355A5F] py-1 px-4 shadow-md'>{item.subject}</span>}
+                                    {item.subject === 'Listening' && <span className='capitalize text-sm font-medium bg-[#FF898933] rounded-full text-[#663737] py-1 px-4 shadow-md'>{item.subject}</span>}
+                                    {item.subject === 'Reading' && <span className='capitalize text-sm font-medium bg-[#0064E133] rounded-full text-[#0064E1] py-1 px-4 shadow-md'>{item.subject}</span>}
+                                    {item.subject === 'Speaking' && <span className='capitalize text-sm font-medium bg-[#E19AF233] rounded-full text-[#5A3E61] py-1 px-4 shadow-md'>{item.subject}</span>}
                                 </h4>
                                 <p className='text-sm flex-1'>
                                     {item.description?.length > 90 ? item.description.split('').slice(0, 90).join('') + '...' : item.description}
