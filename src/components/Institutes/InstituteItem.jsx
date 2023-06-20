@@ -8,6 +8,7 @@ import Image from "../shared/Image";
 import { LocationOn, Share } from "@mui/icons-material";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
+import 'swiper/css';
 
 // assets
 // import img1 from '../../assets/images/worldwide.svg';
@@ -26,7 +27,7 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
     const {
         id,
         name,
-        images,
+        orgImages,
         address,
         // verified,
         // tagline,
@@ -48,7 +49,7 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
         <div className="px-4 sm:px-4 py-6 rounded-xl mb-6 flex flex-col lg:flex-row gap-x-4 gap-y-6 shadow-xl bg-white">
             <div className="lg:w-4/12 flex items-center">
                 <div className="w-full overflow-hidden rounded-lg">
-                    {Array.isArray(images) && images.length > 0 && <>
+                    {Array.isArray(orgImages) && orgImages.length > 0 && <>
                         <Swiper
                             speed={300}
                             spaceBetween={10}
@@ -56,9 +57,9 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
                             thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
                             className="h-48 sm:h-72 lg:h-52"
                         >
-                            {Array.isArray(images) && images.map(i =>
+                            {Array.isArray(orgImages) && orgImages.map(i =>
                                 <SwiperSlide key={i.name}>
-                                    <div className="h-full w-full">
+                                    <div className="h-full w-full rounded-lg overflow-hidden">
                                         <Image src={i.name} alt={i.name} className='w-full h-full object-cover' />
                                     </div>
                                 </SwiperSlide>
@@ -72,12 +73,12 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
                             watchSlidesProgress={true}
                             freeMode={true}
                             modules={[Thumbs, FreeMode]}
-                            className="h-12 sm:h-16 lg:h-10"
+                            className="h-12 sm:h-16 lg:h-14 mt-3"
                         >
-                            {Array.isArray(images) && images.map(i =>
+                            {Array.isArray(orgImages) && orgImages.map(i =>
                                 <SwiperSlide key={i.name}>
                                     <div className="w-full h-full p-1 cursor-pointer">
-                                        <Image src={i.name} alt={i.name} className='w-full h-full object-cover rounded-md' />
+                                        <Image src={i.name} alt={i.name} className='border-2 w-full h-full object-cover rounded-md' />
                                     </div>
                                 </SwiperSlide>
                             )}

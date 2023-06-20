@@ -29,9 +29,10 @@ import VideoModal from "../components/shared/VideoModal";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
-import { Delete } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import AddItem from "../components/Library/AddItem";
+import EditModal from "../components/Library/EditModal";
 
 const Library = () => {
 
@@ -43,6 +44,7 @@ const Library = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [addModal, setAddModal] = useState(false);
+    const [editModal, setEditModal] = useState(null);
 
     const openPopup = (file, link) => {
         setSelectedFile({ file, link });
@@ -282,7 +284,26 @@ const Library = () => {
                                         }</p>
                                 </div>
                             </div>
-                            <div className="pb-5 w-full px-5">
+                            <div className="pb-5 w-full px-5 flex flex-col gap-y-4">
+                                <Button
+                                    variant="outlined"
+                                    sx={{
+                                        color: '#1B3B7D',
+                                        borderRadius: '7px',
+                                        border: '2px solid #1B3B7D',
+                                        textTransform: 'capitalize',
+                                        width: '100%',
+                                        '&:hover': {
+                                            border: '2px solid #1B3B7D',
+                                        }
+                                    }}
+                                    endIcon={<Edit />}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditModal(item);
+                                    }}
+                                >Update</Button>
+
                                 <Button
                                     variant="outlined"
                                     sx={{
@@ -356,6 +377,14 @@ const Library = () => {
                 open={addModal}
                 close={() => setAddModal(false)}
                 refetch={refetch}
+            />
+
+            {/* Edit library item modal */}
+            <EditModal
+                open={Boolean(editModal)}
+                close={() => setEditModal(null)}
+                refetch={refetch}
+                item={editModal}
             />
 
         </Box>

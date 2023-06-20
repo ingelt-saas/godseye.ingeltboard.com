@@ -2,6 +2,9 @@ import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@m
 import { useState } from "react";
 import instituteApi from "../../api/institute";
 import { toast } from "react-toastify";
+import { useRef } from "react";
+import Compressor from "compressorjs";
+import { Remove } from "@mui/icons-material";
 
 const InputFieldStyle = {
     paddingTop: "10px",
@@ -112,6 +115,9 @@ const AddInstitute = () => {
         State: "",
         Zone: "",
     });
+    const [selectedImages, setSelectedImages] = useState([]);
+    const imageFieldInput = useRef();
+
 
     const handleChange = (e) => {
         setFormData({
@@ -123,8 +129,18 @@ const AddInstitute = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const Form = new FormData();
+
+        for (let image of selectedImages) {
+            Form.append('images', image);
+        }
+
+        for (let key in formData) {
+            Form.append(key, formData[key]);
+        }
+
         try {
-            await instituteApi.create(formData);
+            await instituteApi.create(Form);
             toast.success("Submitted.");
             resetForm();
             window.location.reload();
@@ -252,6 +268,37 @@ const AddInstitute = () => {
         },
     ];
 
+    // image compression
+    const imageCompress = (file) => new Promise((resolve) => {
+        new Compressor(file, {
+            quality: 0.6,
+            convertTypes: 'image/webp',
+            success: (result) => resolve(result)
+        });
+    });
+
+    // image handler 
+    const imagesHandler = async (e) => {
+
+        const compressedImages = [...selectedImages];
+
+        const files = e.target.files;
+        for (let file of files) {
+            if (['image/png', 'image/jpeg', 'image/webp'].includes(file.type) && compressedImages.length < 5) {
+                const compressImage = await imageCompress(file);
+                compressedImages.push(compressImage);
+            }
+        }
+        setSelectedImages(compressedImages);
+    }
+
+    // selected image remove handler
+    const removeImageFromSelectedImages = (index) => {
+        let images = [...selectedImages];
+        images.splice(index, 1);
+        setSelectedImages(images);
+    }
+
     return (
         <div className="">
             <form
@@ -324,6 +371,41 @@ const AddInstitute = () => {
                                 ))}
                         </Select>
                     </FormControl>
+                    <div className="mt-4">
+                        <div className="flex flex-wrap gap-4 mb-4">
+                            {selectedImages.map((item, index) => <div className="w-40 h-40 border-2 overflow-hidden cursor-pointer relative rounded-lg" key={index}>
+                                <button
+                                    type="button"
+                                    onClick={() => removeImageFromSelectedImages(index)}
+                                    className="absolute text-white grid place-items-center w-6 h-6 rounded-full top-1 right-1 bg-[#0C3C82] bg-opacity-70 duration-200 hover:bg-opacity-100"
+                                >
+                                    <Remove />
+                                </button>
+                                <img src={URL.createObjectURL(item)} className="w-full h-full object-cover" />
+                            </div>)}
+                        </div>
+                        <input onChange={imagesHandler} ref={imageFieldInput} type="file" multiple className="sr-only hidden" accept=".png, .webp, .jepg, .jpg" />
+                        <Button
+                            disabled={Boolean(selectedImages.length >= 5)}
+                            variant="contained"
+                            onClick={() => {
+                                imageFieldInput.current.click();
+                            }}
+                            type="button"
+                            sx={{
+                                backgroundColor: '#0C3C82',
+                                color: 'white',
+                                textTransform: 'capitalize',
+                                fontWeight: 500,
+                                padding: '0.4rem 2rem',
+                                '&:hover': {
+                                    backgroundColor: '#0C3C82',
+                                }
+                            }}
+                        >
+                            Add Images
+                        </Button>
+                    </div>
                 </div>
 
                 <Button
