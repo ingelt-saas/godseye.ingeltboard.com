@@ -119,9 +119,11 @@ const AddBlog = ({ refetch }) => {
                                 fullWidth
                                 id="standard-basic"
                                 type='text'
-                                label='Title'
+                                // label='Title'
                                 variant="standard"
-                                InputLabelProps={{ className: '!text-base !pl-3' }}
+                                placeholder="Blog title"
+                                inputProps={{ sx: { paddingLeft: '1rem' } }}
+                                // InputLabelProps={{ shrink: true, className: '!text-base !pl-3' }}
                                 sx={{
                                     '& .MuiInput-underline:after': {
                                         borderColor: '#001E43 !important',
