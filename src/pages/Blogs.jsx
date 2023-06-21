@@ -1,5 +1,5 @@
 import { Alert, Button, CircularProgress, Modal } from "@mui/material";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AddBlog from "../components/Blogs/AddBlog";
 import { useQuery } from '@tanstack/react-query';
 import blogsApi from "../api/blogs";
@@ -7,7 +7,7 @@ import { useState } from "react";
 import PaginationComponent from "../components/shared/PaginationComponent";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
-import { ArrowRightAlt, Close, Delete } from "@mui/icons-material";
+import { ArrowRightAlt, Close, Delete, Edit } from "@mui/icons-material";
 import Image from "../components/shared/Image";
 import moment from "moment/moment";
 import Categories from "../components/Blogs/Categories";
@@ -35,7 +35,28 @@ const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
                 </button>
                 <span>{' '}</span>
             </div>
-            <div>
+            <div className="flex justify-between gap-x-3">
+                <Button
+                    href={`/blogs?page=add-blog&id=${data.id}`}
+                    variant="outlined"
+                    sx={{
+                        color: '#1B3B7D',
+                        borderRadius: '0.5rem',
+                        border: '2px solid #1B3B7D',
+                        textTransform: 'capitalize',
+                        width: '100%',
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            border: '2px solid #1B3B7D',
+                            color: '#1B3B7D',
+                        }
+                    }}
+                    endIcon={<Edit />}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                >Update</Button>
+
                 <Button
                     variant="contained"
                     sx={{
