@@ -36,6 +36,10 @@ const AddBlog = ({ refetch }) => {
     // add blog handler
     const blogAddHandler = async (data) => {
 
+        if (!data.forStudent) {
+            data.forStudent = false;
+        }
+
         if (!selectedImage) {
             toast.error('Please select thumbnail');
             return;
@@ -68,6 +72,9 @@ const AddBlog = ({ refetch }) => {
     const blogUpdateHandler = async (data) => {
 
         const formData = new FormData();
+        if (!data.forStudent) {
+            data.forStudent = false;
+        }
 
         if (typeof selectedImage === 'object') {
             formData.append('thumbnail', selectedImage);
@@ -98,6 +105,7 @@ const AddBlog = ({ refetch }) => {
                     const getBlog = res.data;
                     setValue('title', getBlog.title);
                     setValue('category', getBlog.category);
+                    setValue('forStudent', getBlog.forStudent);
                     const getFileUrl = await getFile(getBlog.picture);
                     setSelectedImage(getFileUrl.data);
                     setBlog(getBlog);
@@ -176,42 +184,56 @@ const AddBlog = ({ refetch }) => {
                         </ImageCropper>
                     </div>
                     <div>
-                        <Controller
-                            name="category"
-                            control={control}
-                            rules={{ required: 'Category is required' }}
-                            render={({ field: { name, onChange, ref, value } }) =>
-                                <FormControl variant="standard" fullWidth>
-                                    <InputLabel id="demo-simple-select-standard-label" className="!pl-3 !text-base">Category</InputLabel>
-                                    <Select
-                                        name={name}
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value || ''}
-                                        labelId="demo-simple-select-standard-label"
-                                        id="demo-simple-select-standard"
-                                        label="Category"
-                                        // InputLabelProps={{ className: '!text-base !pl-3' }}
-                                        sx={{
-                                            '& .MuiInput-underline:after': {
-                                                borderColor: '#001E43 !important',
-                                            },
-                                            '& label.Mui-focused': {
-                                                color: '#001E43 !important',
-                                            }
-                                        }}
-                                        defaultValue={''}
-                                        MenuProps={{ sx: { maxHeight: '50vh' } }}
-                                    >
-                                        <MenuItem value="">
-                                            <em>None</em>
-                                        </MenuItem>
-                                        {categories.map(i => <MenuItem key={i.id} value={i.name}>{i.name}</MenuItem>)}
-                                    </Select>
-                                </FormControl>
-                            }
-                        />
-                        {errors?.category && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.category?.message}</p>}
+                        <div className='mb-4'>
+                            <Controller
+                                name="category"
+                                control={control}
+                                rules={{ required: 'Category is required' }}
+                                render={({ field: { name, onChange, ref, value } }) =>
+                                    <FormControl variant="standard" fullWidth>
+                                        <InputLabel id="demo-simple-select-standard-label" className="!pl-3 !text-base">Category</InputLabel>
+                                        <Select
+                                            name={name}
+                                            ref={ref}
+                                            onChange={onChange}
+                                            value={value || ''}
+                                            labelId="demo-simple-select-standard-label"
+                                            id="demo-simple-select-standard"
+                                            label="Category"
+                                            // InputLabelProps={{ className: '!text-base !pl-3' }}
+                                            sx={{
+                                                '& .MuiInput-underline:after': {
+                                                    borderColor: '#001E43 !important',
+                                                },
+                                                '& label.Mui-focused': {
+                                                    color: '#001E43 !important',
+                                                }
+                                            }}
+                                            defaultValue={''}
+                                            MenuProps={{ sx: { maxHeight: '50vh' } }}
+                                        >
+                                            <MenuItem value="">
+                                                <em>None</em>
+                                            </MenuItem>
+                                            {categories.map(i => <MenuItem key={i.id} value={i.name}>{i.name}</MenuItem>)}
+                                        </Select>
+                                    </FormControl>
+                                }
+                            />
+                            {errors?.category && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.category?.message}</p>}
+                        </div>
+                        <div className='mb-4'>
+                            <Controller
+                                name="forStudent"
+                                control={control}
+                                render={({ field: { name, onChange, ref, value } }) =>
+                                    <div className="flex items-center gap-x-3">
+                                        <label htmlFor="forStudent" className="text-sm cursor-pointer">For Student</label>
+                                        <input type="checkbox" id="forStudent" name={name} onChange={onChange} value={Boolean(value)} checked={Boolean(value)} ref={ref} className="cursor-pointer" />
+                                    </div>
+                                }
+                            />
+                        </div>
                     </div>
                     <div className="col-span-2 mt-5">
                         {error && <p className="text-sm text-center text-red-500 font-medium mb-3">{error}</p>}
