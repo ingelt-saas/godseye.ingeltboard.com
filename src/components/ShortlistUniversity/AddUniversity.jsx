@@ -5,6 +5,9 @@ import { useForm, Controller } from "react-hook-form";
 import universityApi from "../../api/university";
 import { toast } from "react-toastify";
 import areaOfInterestList from "./AreaOfInterestData";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import Image from "../shared/Image";
 
 const TextInputField = ({ label, name, defaultValue, validation, Form, type }) => {
     const { register, formState: { errors } } = Form;
@@ -39,9 +42,12 @@ const AddUniversity = ({ refetch }) => {
     const [selectedLogo, setSelectedLogo] = useState(null);
     const [typeError, setTypeError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [university, setUniversity] = useState(null);
+    const [search] = useSearchParams();
+    const universityId = search.get('id');
 
     const Form = useForm();
-    const { handleSubmit, reset, control, formState: { errors } } = Form;
+    const { handleSubmit, reset, control, setValue, formState: { errors } } = Form;
     const { getRootProps, getInputProps } = useDropzone({
         multiple: false,
         accept: {
@@ -56,6 +62,7 @@ const AddUniversity = ({ refetch }) => {
             }
         },
     });
+
 
     const inputFields = [
         {
@@ -113,7 +120,7 @@ const AddUniversity = ({ refetch }) => {
             validation: {
                 required: 'Course duration is required',
                 pattern: {
-                    value: /^-?\d+\.\d$/,
+                    value: /^-?\d+(\.\d+)?$/,
                     message: 'Course duration should be like 4 or 4.5 ',
                 }
             },
@@ -148,10 +155,57 @@ const AddUniversity = ({ refetch }) => {
         }
     }
 
+    // add university handler
+    const universityUpdateHandler = async (data) => {
+
+        const formData = new FormData();
+
+        if (typeof selectedLogo === 'object') {
+            formData.append('logo', selectedLogo);
+        }
+
+        for (let key in data) {
+            formData.append(key, data[key]);
+        }
+        setLoading(true);
+        setError('');
+        try {
+            await universityApi.update(universityId, formData);
+            refetch();
+            toast.success('University successfully updated');
+        } catch (err) {
+            setError('Sorry! Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+
+    // fetch university by id
+    useEffect(() => {
+        if (universityId) {
+            universityApi.readById(universityId)
+                .then(res => {
+                    const university = res.data;
+                    if (university) {
+                        setValue('name', university.name);
+                        setValue('ranking', university.ranking);
+                        setValue('yearlyFee', university.yearlyFee);
+                        setValue('courseName', university.courseName);
+                        setValue('courseDuration', university.courseDuration);
+                        setValue('address', university.address);
+                        setValue('areaOfInterest', university.areaOfInterest);
+                        university.logo && setSelectedLogo(university.logo);
+                    }
+                    setUniversity(university);
+                })
+        }
+    }, [universityId]);
+
     return (
         <div>
             <div className="bg-white shadow-xl rounded-lg py-10 px-5 lg:w-10/12 mx-auto">
-                <form onSubmit={handleSubmit(universityHandler)} className="grid grid-cols-2 gap-5">
+                <form onSubmit={handleSubmit(university ? universityUpdateHandler : universityHandler)} className="grid grid-cols-2 gap-5">
                     {inputFields.map(item =>
                         <TextInputField
                             key={item.name}
@@ -210,8 +264,11 @@ const AddUniversity = ({ refetch }) => {
                                 <p className="text-sm">Drag 'n' drop logo here, or click to select logo</p>
                                 <p className="text-sm opacity-75">Accept .png, .jepg, .webp</p>
                             </div>}
-                            {selectedLogo && <div className="rounded-md overflow-hidden cursor-pointer">
+                            {(selectedLogo && typeof selectedLogo === 'object') && <div className="rounded-md overflow-hidden cursor-pointer">
                                 <img src={URL.createObjectURL(selectedLogo)} alt='logo' className="max-w-full max-h-full" />
+                            </div>}
+                            {(selectedLogo && typeof selectedLogo === 'string') && <div className="rounded-md overflow-hidden cursor-pointer">
+                                <Image src={selectedLogo} alt='University Logo' className={'max-w-full max-h-full'} />
                             </div>}
                         </div>
                         {typeError && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{typeError}</p>}
@@ -233,7 +290,7 @@ const AddUniversity = ({ refetch }) => {
                             }}
                             type="submit"
                         >
-                            Add University
+                            {university ? 'Update University' : 'Add University'}
                         </Button>
                     </div>
                 </form>

@@ -1,11 +1,12 @@
 import { Button } from '@mui/material';
 import inGeltLogo from '../../assets/logo.png';
 import Image from '../shared/Image';
-import { Delete } from '@mui/icons-material';
+import { Delete, Edit } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 
 const UniversityItem = ({ university, deleteConfirm }) => {
 
-    const { courseName, courseDuration, logo, name, yearlyFee, ranking, address } = university;
+    const { id, courseName, courseDuration, logo, name, yearlyFee, ranking, address } = university;
 
     return (
         <div className="p-4 bg-white border-8 flex flex-col rounded-3xl shadow border-[#E2E7EE] mt-4 justify-between">
@@ -101,7 +102,29 @@ const UniversityItem = ({ university, deleteConfirm }) => {
             </div>
 
             {/* 5th div */}
-            <div className="flex justify-between mu-3">
+            <div className="flex justify-between gap-x-2 mt-2">
+                <Link to={`/shortlist-university?page=add-university&id=${id}`}>
+                    <Button
+                        variant='contained'
+                        sx={{
+                            border: '2px solid #0C3C82',
+                            color: 'white',
+                            borderRadius: '9999px',
+                            textTransform: 'capitalize',
+                            fontWeight: 600,
+                            width: '100%',
+                            backgroundColor: '#0C3C82',
+                            padding: '0.4rem 2rem',
+                            '&:hover': {
+                                border: '2px solid #0C3C82',
+                                backgroundColor: '#0C3C82',
+                            }
+                        }}
+                        endIcon={<Edit />}
+                    >
+                        Update
+                    </Button>
+                </Link>
                 <Button
                     variant='outlined'
                     sx={{
