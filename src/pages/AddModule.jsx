@@ -9,6 +9,7 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 import Image from "../components/shared/Image";
 import getFile from "../api/getFile";
+import moment from 'moment';
 
 const ModuleThumbnail = ({ setThumbnail, setThumbnailError }) => {
 
@@ -204,7 +205,7 @@ const AddModule = () => {
             modulesApi.readById(moduleId)
                 .then(res => {
                     const getModule = res.data;
-                    setModuleData({ ...getModule, releaseDate: new Date(getModule.releaseDate).toISOString().slice(0, 16) });
+                    setModuleData({ ...getModule, releaseDate: moment(getModule.releaseDate).format('YYYY-MM-DDTHH:mm') });
                     if (getModule?.thumbnail) {
                         setSelectedThumbnail(getModule.thumbnail);
                     }
@@ -314,12 +315,12 @@ const AddModule = () => {
                                 label='Release Date'
                                 variant="outlined"
                                 size="small"
-                                value={moduleData.releaseDate || ''}
+                                value={moduleData.releaseDate ? moment(moduleData.releaseDate).format('YYYY-MM-DDTHH:mm') : ''}
                                 InputLabelProps={{ shrink: true }}
                                 type="datetime-local"
                                 onChange={(e) => setModuleData({ ...moduleData, releaseDate: e.target.value })}
                                 InputProps={{
-                                    inputProps: { min: new Date().toISOString().slice(0, 16) },
+                                    inputProps: { min: moment(new Date()).format('YYYY-MM-DDTHH:mm') },
                                     startAdornment: (
                                         <InputAdornment position="start">
                                             {/* Add any desired icon or text */}
