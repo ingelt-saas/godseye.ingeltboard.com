@@ -1,6 +1,6 @@
 import ExampleTheme from "./Theme";
 import { $createParagraphNode, $getRoot, $getSelection } from 'lexical';
-import { $generateHtmlFromNodes } from '@lexical/html'
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html'
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -23,7 +23,7 @@ import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
 import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
 import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import './RichEditor.css';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 function Placeholder() {
@@ -68,9 +68,26 @@ const CustomClearPlugin = ({ content }) => {
     return null;
 }
 
-export default function RichEditor({ changeHandler, content }) {
+const InitialTextSetPlugin = ({ content }) => {
+    const [editor] = useLexicalComposerContext();
+    useEffect(() => {
+        editor.update(() => {
+            if (content) {
+                const parser = new DOMParser();
+                const dom = parser.parseFromString(content, 'text/html');
+                const root = $getRoot();
+                const nodes = $generateNodesFromDOM(editor, dom);
+                root.select();
+                const selection = $getSelection();
+                selection.insertNodes(nodes);
+            }
+        });
+    }, [content]);
+    return null;
+}
 
 
+export default function RichEditor({ changeHandler, content, initialContent }) {
 
     const onChange = (editorState, RichEditor) => {
         RichEditor.update(() => {
@@ -81,8 +98,6 @@ export default function RichEditor({ changeHandler, content }) {
             changeHandler(rawHTML, editorStateTextString);
         });
     }
-
-
 
     return (
         <LexicalComposer initialConfig={editorConfig}>
@@ -101,6 +116,7 @@ export default function RichEditor({ changeHandler, content }) {
                     <LinkPlugin />
                     <AutoLinkPlugin />
                     <CustomClearPlugin content={content} />
+                    <InitialTextSetPlugin content={initialContent} />
                     <OnChangePlugin onChange={onChange} />
                     <ListMaxIndentLevelPlugin maxDepth={7} />
                     <MarkdownShortcutPlugin transformers={TRANSFORMERS} />

@@ -9,12 +9,19 @@ import blogsApi from "../../api/blogs";
 import { useQuery } from "@tanstack/react-query";
 import categoryApi from "../../api/category";
 import RichEditor from "./RichEditor/RichEditor";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import getFile from "../../api/getFile";
+
 
 const AddBlog = ({ refetch }) => {
 
     const [error, setFormError] = useState('');
     const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [blog, setBlog] = useState(null);
+    const [search] = useSearchParams();
+    const id = search.get('id');
 
     const { register, handleSubmit, control, reset, setValue, getValues, clearErrors, setError, resetField, formState: { errors } } = useForm();
 
@@ -26,6 +33,7 @@ const AddBlog = ({ refetch }) => {
         }
     });
 
+    // add blog handler
     const blogAddHandler = async (data) => {
 
         if (!selectedImage) {
@@ -56,32 +64,85 @@ const AddBlog = ({ refetch }) => {
         }
     }
 
+    // blog update handler
+    const blogUpdateHandler = async (data) => {
+
+        const formData = new FormData();
+
+        if (typeof selectedImage === 'object') {
+            formData.append('thumbnail', selectedImage);
+        }
+
+        for (let key in data) {
+            formData.append(key, data[key]);
+        }
+
+        setLoading(true);
+        setFormError('');
+        try {
+            await blogsApi.update(id, formData);
+            refetch();
+            toast.success('Blog update successfully');
+        } catch (err) {
+            setFormError('Sorry! Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    // get blog by blog id
+    useEffect(() => {
+        if (id) {
+            blogsApi.readById(id)
+                .then(async (res) => {
+                    const getBlog = res.data;
+                    setValue('title', getBlog.title);
+                    setValue('category', getBlog.category);
+                    const getFileUrl = await getFile(getBlog.picture);
+                    setSelectedImage(getFileUrl.data);
+                    setBlog(getBlog);
+                })
+        }
+    }, [id]);
+
+
     return (
         <>
             <div className="lg:w-10/12 mx-auto bg-white shadow-lg rounded-xl px-5 py-10">
-                <form onSubmit={handleSubmit(blogAddHandler)} className="grid grid-cols-2 gap-5">
+                <form onSubmit={handleSubmit(id ? blogUpdateHandler : blogAddHandler)} className="grid grid-cols-2 gap-5">
                     <div className="col-span-2">
-                        <TextField
-                            fullWidth
-                            id="standard-basic"
-                            type='text'
-                            label='Title'
-                            variant="standard"
-                            InputLabelProps={{ className: '!text-base !pl-3' }}
-                            sx={{
-                                '& .MuiInput-underline:after': {
-                                    borderColor: '#001E43 !important',
-                                },
-                                '& label.Mui-focused': {
-                                    color: '#001E43 !important',
-                                }
-                            }}
-                            {...register('title', { required: 'Title is required' })}
+                        <Controller
+                            name='title'
+                            control={control}
+                            rules={{ required: 'Title is required' }}
+                            render={({ field: { value, name, } }) => <TextField
+                                fullWidth
+                                id="standard-basic"
+                                type='text'
+                                // label='Title'
+                                variant="standard"
+                                placeholder="Blog title"
+                                inputProps={{ sx: { paddingLeft: '1rem' } }}
+                                // InputLabelProps={{ shrink: true, className: '!text-base !pl-3' }}
+                                sx={{
+                                    '& .MuiInput-underline:after': {
+                                        borderColor: '#001E43 !important',
+                                    },
+                                    '& label.Mui-focused': {
+                                        color: '#001E43 !important',
+                                    }
+                                }}
+                                value={value}
+                                name={name}
+                                onChange={(e) => setValue('title', e.target.value)}
+                            />}
                         />
+
                         {errors?.title && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.title?.message}</p>}
                     </div>
                     <div className="col-span-2">
                         <RichEditor
+                            initialContent={blog && blog.content}
                             content={getValues('content')}
                             changeHandler={(html, text) => {
                                 if (text.trim()) {
@@ -104,9 +165,14 @@ const AddBlog = ({ refetch }) => {
                                 <p className="text-sm opacity-75">Accept .png, .jepg, .webp</p>
                             </div>}
 
-                            {selectedImage && <div className="rounded-lg overflow-hidden cursor-pointer">
+                            {(selectedImage && typeof selectedImage === 'object') && <div className="rounded-lg overflow-hidden cursor-pointer">
                                 <img src={URL.createObjectURL(selectedImage)} alt='logo' className="w-full h-auto" />
                             </div>}
+
+                            {(selectedImage && typeof selectedImage === 'string') && <div className="rounded-lg overflow-hidden cursor-pointer">
+                                <img src={selectedImage} alt='logo' className="w-full h-auto" />
+                            </div>}
+
                         </ImageCropper>
                     </div>
                     <div>
@@ -145,7 +211,6 @@ const AddBlog = ({ refetch }) => {
                                 </FormControl>
                             }
                         />
-
                         {errors?.category && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.category?.message}</p>}
                     </div>
                     <div className="col-span-2 mt-5">
@@ -165,7 +230,7 @@ const AddBlog = ({ refetch }) => {
                             }}
                             type="submit"
                         >
-                            Post Blog
+                            {id ? 'Update Blog' : 'Post Blog'}
                         </Button>
                     </div>
                 </form>
