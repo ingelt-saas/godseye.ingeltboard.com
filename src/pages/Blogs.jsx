@@ -252,7 +252,7 @@ const Blogs = () => {
                     <div className="w-full h-auto rounded-lg overflow-hidden">
                         <Image src={viewBlog?.picture} alt={viewBlog?.title} className={'w-full h-auto'} />
                     </div>
-                    <div className=" flex flex-col gap-y-4 mt-4">
+                    <div className="flex flex-col gap-y-4 mt-4">
                         <div className="flex items-center justify-between">
                             <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{viewBlog?.category}</span>
                             <span className="text-sm">{moment(viewBlog?.createdAt).format('lll')}</span>
