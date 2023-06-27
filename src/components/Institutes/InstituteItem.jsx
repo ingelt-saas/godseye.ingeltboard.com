@@ -5,7 +5,7 @@ import { Rating } from "react-simple-star-rating";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs, FreeMode } from 'swiper';
 import Image from "../shared/Image";
-import { LocationOn, Share } from "@mui/icons-material";
+import { Delete, Edit, LocationOn, Share } from "@mui/icons-material";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import 'swiper/css';
@@ -16,8 +16,9 @@ import 'swiper/css';
 // import img3 from '../../assets/images/phone-contact.svg';
 import img4 from '../../assets/discount.svg';
 import phoneSVG from '../../assets/phone.svg';
+import { Button } from "@mui/material";
 
-const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
+const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
 
     // const prevRef = useRef();
     // const nextRef = useRef();
@@ -37,13 +38,6 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
         sponsored,
         phoneNo
     } = institute;
-
-    // user context
-    // const { user } = useContext(UserContext);
-    // check if logged student have to applied
-    // const applied = user && user?.organizations.find((org) => org.id === id);
-
-    const appliedInstitute = Array.isArray(appliedInstitutes) ? appliedInstitutes.find(i => i.organizationId === id) : false;
 
     return (
         <div className="px-4 sm:px-4 py-6 rounded-xl mb-6 flex flex-col lg:flex-row gap-x-4 gap-y-6 shadow-xl bg-white">
@@ -167,6 +161,44 @@ const InstituteItem = ({ applyHandler, institute, appliedInstitutes }) => {
                         className="py-2 px-7 text-white bg-[#0C3C82] rounded-lg font-medium"
                         onClick={(e) => applyHandler(e, { name, id })}
                     >{appliedInstitute ? 'Applied' : 'Apply'}</button> */}
+                </div>
+                <div className="flex justify-end gap-x-3">
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            color: '#1B3B7D',
+                            borderRadius: '7px',
+                            border: '2px solid #1B3B7D',
+                            textTransform: 'capitalize',
+                            '&:hover': {
+                                border: '2px solid #1B3B7D',
+                            }
+                        }}
+                        endIcon={<Edit />}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // navigate(`/modules/add?id=${item.id}`);
+                        }}
+                    >Update</Button>
+                    <Button
+                        variant="outlined"
+                        sx={{
+                            color: 'white',
+                            borderRadius: '7px',
+                            border: '2px solid #1B3B7D',
+                            textTransform: 'capitalize',
+                            backgroundColor: '#1B3B7D',
+                            '&:hover': {
+                                color: '#1B3B7D',
+                                border: '2px solid #1B3B7D',
+                            }
+                        }}
+                        endIcon={<Delete />}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirm(institute);
+                        }}
+                    >Delete</Button>
                 </div>
             </div>
         </div>

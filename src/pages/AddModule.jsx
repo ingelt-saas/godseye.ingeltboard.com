@@ -1,5 +1,5 @@
 import { Textarea } from "@mui/joy";
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment, CircularProgress } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactPlayer from "react-player";
@@ -39,6 +39,7 @@ const AddModule = () => {
     const [thumbnailError, setThumbnailError] = useState('');
     const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null });
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
     const [search] = useSearchParams();
     const moduleId = search.get('id');
 
@@ -98,7 +99,7 @@ const AddModule = () => {
         }
 
 
-
+        setLoading(true);
         e.target.disabled = true;
         const formData = new FormData();
 
@@ -125,6 +126,7 @@ const AddModule = () => {
         } catch (err) {
             toast.error('Sorry! Something went wrong');
         } finally {
+            setLoading(false);
             e.target.disabled = false;
         }
 
@@ -166,7 +168,7 @@ const AddModule = () => {
         }
 
 
-
+        setLoading(true);
         e.target.disabled = true;
         const toastId = toast.loading('Updating...');
         const formData = new FormData();
@@ -194,6 +196,7 @@ const AddModule = () => {
         } catch (err) {
             toast.error('Sorry! Something went wrong');
         } finally {
+            setLoading(false);
             toast.dismiss(toastId);
             e.target.disabled = false;
         }
@@ -330,6 +333,11 @@ const AddModule = () => {
                             />
                             {errors?.releaseDate && <span className="mt-1 text-xs text-red-500">{errors.releaseDate}</span>}
                         </div>
+
+                        {loading && <div className="flex flex-col gap-y-5 items-center">
+                            <CircularProgress />
+                            <p className="text-center text-sm text-yellow-700">Don't reload this page</p>
+                        </div>}
 
                         {errors?.formError && <p className="mt-1 text-xs text-center text-red-500">{errors.formError}</p>}
 

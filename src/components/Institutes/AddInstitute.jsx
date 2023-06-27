@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useRef } from "react";
 import Compressor from "compressorjs";
 import { Remove } from "@mui/icons-material";
+import { useForm } from "react-hook-form";
 
 const InputFieldStyle = {
     paddingTop: "10px",
@@ -117,7 +118,11 @@ const AddInstitute = () => {
     });
     const [selectedImages, setSelectedImages] = useState([]);
     const imageFieldInput = useRef();
+    const [defaultValues, setDefaultValues] = useState({});
 
+    // react-hook-form 
+    const Form = useForm({ defaultValues: defaultValues });
+    const { handleSubmit, } = Form;
 
     const handleChange = (e) => {
         setFormData({
@@ -126,29 +131,29 @@ const AddInstitute = () => {
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
 
-        const Form = new FormData();
+    //     const Form = new FormData();
 
-        for (let image of selectedImages) {
-            Form.append('images', image);
-        }
+    //     for (let image of selectedImages) {
+    //         Form.append('images', image);
+    //     }
 
-        for (let key in formData) {
-            Form.append(key, formData[key]);
-        }
+    //     for (let key in formData) {
+    //         Form.append(key, formData[key]);
+    //     }
 
-        try {
-            await instituteApi.create(Form);
-            toast.success("Submitted.");
-            resetForm();
-            window.location.reload();
-            // reset();
-        } catch (err) {
-            toast.error("Sorry! Something went wrong.");
-        }
-    };
+    //     try {
+    //         await instituteApi.create(Form);
+    //         toast.success("Submitted.");
+    //         resetForm();
+    //         window.location.reload();
+    //         // reset();
+    //     } catch (err) {
+    //         toast.error("Sorry! Something went wrong.");
+    //     }
+    // };
 
     const resetForm = () => {
         setFormData({
@@ -171,61 +176,56 @@ const AddInstitute = () => {
 
     const inputFieldArr = [
         {
-            label: "Partner's Images",
-            name: "PartnerImages",
-            type: "file",
-        },
-        {
             label: "Partner's Name",
-            name: "Partnername",
+            name: "partnerName",
             type: "text",
         },
         {
             label: "Partner's Phone",
-            name: "PartnerPhoneNo",
+            name: "partnerPhoneNo",
             type: "tel",
             validation: {
                 pattern: {
                     value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                    message: "Please provide valid phone number",
+                    message: "Invalid phone number",
                 },
             },
         },
         {
             label: "Partner's Email",
-            name: "PartnerEmail",
+            name: "partnerEmail",
             type: "email",
             validation: {
                 pattern: {
                     value: /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/,
-                    message: "Please provide valid email address",
+                    message: "Invalid email address",
                 },
             },
         },
         {
             label: "Institute's Name",
-            name: "InstituteName",
+            name: "name",
             type: "text",
         },
         {
             label: "Institute's Phone",
-            name: "InstitutePhone",
+            name: "phoneNo",
             type: "tel",
             validation: {
                 pattern: {
                     value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                    message: "Please provide valid phone number",
+                    message: "Invalid phone number",
                 },
             },
         },
         {
             label: "Institute's Email",
-            name: "InstituteEmail",
+            name: "email",
             type: "email",
             validation: {
                 pattern: {
                     value: /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/,
-                    message: "Please provide valid email address",
+                    message: "Invalid email address",
                 },
             },
         },
@@ -241,9 +241,15 @@ const AddInstitute = () => {
             },
         },
         {
+            label: "Address",
+            name: "address",
+            type: "text"
+        },
+        {
             label: "Rating",
             name: "overallRating",
-            type: "float",
+            type: "text",
+
         },
         {
             label: "Demo video URL",
@@ -258,12 +264,12 @@ const AddInstitute = () => {
         },
         {
             label: "Prize",
-            name: "prize",
+            name: "fee",
             type: "number",
         },
         {
             label: "Discounted Price",
-            name: "discountedPrice",
+            name: "discountedFee",
             type: "number",
         },
     ];
