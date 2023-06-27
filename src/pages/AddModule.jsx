@@ -1,5 +1,5 @@
-import { Textarea } from "@mui/joy";
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment } from "@mui/material";
+import { ListItemButton, Textarea } from "@mui/joy";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment, CircularProgress, LinearProgress } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactPlayer from "react-player";
@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import Image from "../components/shared/Image";
 import getFile from "../api/getFile";
 import moment from 'moment';
+import uploadToAWS from "../aws/upload";
 
 const ModuleThumbnail = ({ setThumbnail, setThumbnailError }) => {
 
@@ -39,6 +40,9 @@ const AddModule = () => {
     const [thumbnailError, setThumbnailError] = useState('');
     const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null });
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [videoProgress, setVideoProgress] = useState(null);
+    const [imageProgress, setImageProgress] = useState(null);
     const [search] = useSearchParams();
     const moduleId = search.get('id');
 
@@ -59,6 +63,30 @@ const AddModule = () => {
         video.src = URL.createObjectURL(file)
         video.onloadedmetadata = () => {
             resolve(video.duration);
+        }
+    });
+
+    // upload to aws s3 | module thumbnail & module video
+    const uploadVideoAndThumbnail = (video, image) => new Promise(async (resolve, reject) => {
+        try {
+            let result = { video: null, image: null };
+            if (image) {
+                const uploadedImage = await uploadToAWS(image, 'ingelt/modules/thumbnails', (event) => {
+                    setImageProgress(Math.round((event.loaded * 100) / event.total));
+                });
+                result.image = uploadedImage;
+            }
+
+            // Math.floor(current / total * 100)
+            if (video) {
+                const uploadedVideo = await uploadToAWS(video, 'ingelt/modules/videos', (event) => {
+                    setVideoProgress(Math.round((event.loaded * 100) / event.total))
+                });
+                result.video = uploadedVideo;
+            }
+            resolve(result);
+        } catch (err) {
+            reject(err);
         }
     });
 
@@ -97,23 +125,30 @@ const AddModule = () => {
             }
         }
 
+        // upload to aws
+        const uploadedFiles = await uploadVideoAndThumbnail(
+            selectedModule && selectedModule || null,
+            selectedThumbnail && selectedThumbnail || null,
+        );
 
-
+        setLoading(true);
         e.target.disabled = true;
-        const formData = new FormData();
+        const formData = {};
 
         if (selectedModule) {
             const duration = await getVideoDuration(selectedModule);
-            formData.append('file', selectedModule);
-            formData.append('duration', duration);
+            formData.file = uploadedFiles.video.Key;
+            formData.fileSize = selectedModule.size;
+            formData.duration = duration;
         }
 
-        formData.append('thumbnail', selectedThumbnail);
-        formData.append('subject', moduleData.subject);
-        formData.append('name', moduleData.name);
-        formData.append('description', moduleData.description);
+        formData.thumbnail = uploadedFiles.image.Key;
+        formData.subject = moduleData.subject;
+        formData.description = moduleData.description;
+        formData.name = moduleData.name;
+
         if (moduleData.releaseDate) {
-            formData.append('releaseDate', moduleData.releaseDate);
+            formData.releaseDate = moduleData.releaseDate;
         }
 
         try {
@@ -122,9 +157,13 @@ const AddModule = () => {
             setSelectedModule(null);
             setSelectedThumbnail(null);
             setModuleData({ name: '', description: '', subject: '', releaseDate: null });
+            setImageProgress(null);
+            setVideoProgress(null);
         } catch (err) {
+            console.log(err)
             toast.error('Sorry! Something went wrong');
         } finally {
+            setLoading(false);
             e.target.disabled = false;
         }
 
@@ -166,34 +205,51 @@ const AddModule = () => {
         }
 
 
-
+        setLoading(true);
         e.target.disabled = true;
-        const toastId = toast.loading('Updating...');
-        const formData = new FormData();
+        const formData = {};
 
-        if (selectedModule && typeof selectedModule === 'object') {
-            const duration = await getVideoDuration(selectedModule);
-            formData.append('file', selectedModule);
-            formData.append('duration', duration);
+        if ((selectedModule && typeof selectedModule === 'object') || selectedThumbnail && typeof selectedThumbnail === 'object') {
+
+
+            const videoForUpload = typeof selectedModule === 'object' ? selectedModule : null;
+            const imageForUpload = typeof selectedThumbnail === 'object' ? selectedThumbnail : null;
+
+            // upload to aws
+            const uploadedFiles = await uploadVideoAndThumbnail(videoForUpload, imageForUpload);
+
+            if (videoForUpload) {
+                const duration = await getVideoDuration(selectedModule);
+                formData.file = uploadedFiles.video.Key;
+                formData.fileSize = selectedModule.size;
+                formData.duration = duration;
+            }
+
+            if (imageForUpload) {
+                formData.thumbnail = uploadedFiles.image.Key;
+            }
+
         }
 
-        if (selectedThumbnail && typeof selectedThumbnail === 'object') {
-            formData.append('thumbnail', selectedThumbnail);
-        }
+        formData.subject = moduleData.subject;
+        formData.description = moduleData.description;
+        formData.name = moduleData.name;
 
-        formData.append('subject', moduleData.subject);
-        formData.append('name', moduleData.name);
-        formData.append('description', moduleData.description);
         if (moduleData.releaseDate) {
-            formData.append('releaseDate', moduleData.releaseDate);
+            formData.releaseDate = moduleData.releaseDate;
         }
+
+        const toastId = toast.loading('Updating...');
 
         try {
             await modulesApi.update(moduleId, formData);
             toast.success('Module update successfully');
+            setImageProgress(null);
+            setVideoProgress(null);
         } catch (err) {
             toast.error('Sorry! Something went wrong');
         } finally {
+            setLoading(false);
             toast.dismiss(toastId);
             e.target.disabled = false;
         }
@@ -330,6 +386,21 @@ const AddModule = () => {
                             />
                             {errors?.releaseDate && <span className="mt-1 text-xs text-red-500">{errors.releaseDate}</span>}
                         </div>
+
+                        {videoProgress !== null && <div className={`flex flex-col gap-y-1 px-4 ${videoProgress >= 100 && 'bg-green-200'} py-3`}>
+                            <p className={`!text-sm font-medium ${imageProgress < 100 ? 'text-black' : 'text-green-600'}`}>Module Video {videoProgress < 100 ? 'Uploading' : 'Uploaded'}</p>
+                            <LinearProgress variant="determinate" value={videoProgress} />
+                        </div>}
+
+                        {imageProgress !== null && <div className={`flex flex-col gap-y-1 px-4 ${imageProgress >= 100 && 'bg-green-200'} py-3`}>
+                            <p className={`!text-sm font-medium ${imageProgress < 100 ? 'text-black' : 'text-green-600'}`}>Module Thumbnail {imageProgress < 100 ? 'Uploading' : 'Uploaded'}</p>
+                            <LinearProgress variant="determinate" value={imageProgress} />
+                        </div>}
+
+                        {/* {loading && <div className="flex flex-col gap-y-5 items-center">
+                            <CircularProgress />
+                            <p className="text-center text-sm text-yellow-700">Don't reload this page</p>
+                        </div>} */}
 
                         {errors?.formError && <p className="mt-1 text-xs text-center text-red-500">{errors.formError}</p>}
 

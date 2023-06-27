@@ -4,12 +4,14 @@ import instituteApi from "../../api/institute";
 import { Alert } from "@mui/material";
 import InstituteItem from "./InstituteItem";
 import PaginationComponent from "../shared/PaginationComponent";
+import DeleteConfirmModal from "../shared/DeleteConfirmModal";
+import { toast } from "react-toastify";
 
 const AllInstitutes = () => {
 
     const [pagination, setPagination] = useState({ page: 1, rows: 10 });
     const [searchQuery, setSearchQuery] = useState('');
-    // const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [deleteConfirm, setDeleteConfirm] = useState(null);
 
     const { data: institutes, isLoading, refetch } = useQuery({
         queryKey: ['institutes', pagination, searchQuery],
@@ -19,12 +21,24 @@ const AllInstitutes = () => {
         }
     });
 
-    //     < InstituteItem
-    // key = { index }
-    // applyHandler = { applyHandler }
-    // appliedInstitutes = { appliedInstitutes }
-    // institute = { institute }
-    //     />
+    // delete handler
+    const deleteInstitute = async (e) => {
+        if (!deleteConfirm) {
+            return;
+        }
+
+        e.target.disabled = true;
+        try {
+            await instituteApi.delete(deleteConfirm.id);
+            refetch();
+            toast.success(`${deleteConfirm.name} deleted successfully`);
+            setDeleteConfirm(null);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            e.target.disabled = false;
+        }
+    }
 
     return (
         <div className="">
@@ -34,6 +48,7 @@ const AllInstitutes = () => {
                         <InstituteItem
                             key={item.id}
                             institute={item}
+                            setDeleteConfirm={setDeleteConfirm}
                         />
                     )}
                     <div className="flex justify-center">
@@ -48,6 +63,16 @@ const AllInstitutes = () => {
                     No Institute Found
                 </Alert>
             )}
+
+            {/* delete confirm modal */}
+            <DeleteConfirmModal
+                close={() => setDeleteConfirm(null)}
+                confirmHandler={deleteInstitute}
+                data={deleteConfirm}
+                name={'institute'}
+                open={Boolean(deleteConfirm)}
+            />
+
         </div>
     );
 }
