@@ -1,4 +1,4 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, CircularProgress, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { useState } from "react";
 import instituteApi from "../../api/institute";
 import { toast } from "react-toastify";
@@ -6,6 +6,10 @@ import { useRef } from "react";
 import Compressor from "compressorjs";
 import { Remove } from "@mui/icons-material";
 import { Controller, useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import uploadToAWS from "../../aws/upload";
+import Image from '../shared/Image';
 
 const InputFieldStyle = {
     paddingTop: "10px",
@@ -102,81 +106,95 @@ const InputField = ({ label, name, type, validation, options, Form }) => {
 
 const AddInstitute = () => {
 
-    const [formData, setFormData] = useState({
-        PartnerImages: "",
-        Partnername: "",
-        PartnerPhoneNo: "",
-        PartnerEmail: "",
-        InstituteName: "",
-        InstitutePhone: "",
-        InstituteEmail: "",
-        website: "",
-        overallRating: 0,
-        DemoVideoURL: "",
-        prize: 0,
-        discountedPrice: 0,
-        State: "",
-        Zone: "",
-    });
     const [selectedImages, setSelectedImages] = useState([]);
-    const imageFieldInput = useRef();
+    const imageFieldInput = useRef(null);
     const [defaultValues, setDefaultValues] = useState({});
     const [selectedState, setSelectedState] = useState(null);
+    const [institute, setInstitute] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [search] = useSearchParams();
+    const instituteId = search.get('id');
 
     // react-hook-form 
     const Form = useForm({ defaultValues: defaultValues });
-    const { handleSubmit, control, formState: { errors }, reset } = Form;
+    const { handleSubmit, control, formState: { errors }, reset, setValue } = Form;
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+    // upload to s3
+    const orgImagesUpload = async () => {
+        let arr = [];
+        for (let image of selectedImages) {
+            if (typeof image === 'object') {
+                const res = await uploadToAWS(image, 'institute');
+                arr.push(res);
+            } else {
+                arr.push({ Key: image });
+            }
+        }
+        return arr;
+    }
 
+    // institute add handler
     const addInstitute = async (data) => {
 
-        const Form = new FormData();
+        setLoading(true);
+        setError('');
+        const images = await orgImagesUpload();
 
-        for (let image of selectedImages) {
-            Form.append('images', image);
+        data.images = images.map(i => i.Key);
+        setSelectedImages(data.images);
+
+        try {
+            await instituteApi.create(data);
+            toast.success("Institute created.");
+            reset();
+            setSelectedImages([]);
+        } catch (err) {
+            if (err.response.status === 409) {
+                setError(err.response.data?.message);
+            } else {
+                toast.error("Sorry! Something went wrong.");
+            }
+        } finally {
+            setLoading(false);
         }
+    };
+
+    // institute update handler
+    const updateInstitute = async (data) => {
+
+        setError('');
+        setLoading(true);
+        const images = await orgImagesUpload();
+
+        data.images = images.map(i => i.Key);
+        setSelectedImages(data.images);
 
         for (let key in data) {
-            Form.append(key, data[key]);
+            if (data[key] === institute[key]) {
+                delete data[key];
+            }
+        }
+
+        if (data.partnerEmail === institute.admin.email) {
+            delete data.partnerEmail;
         }
 
         try {
-            await instituteApi.create(Form);
-            toast.success("Submitted.");
-            reset();
-            setSelectedImages([]);
-            // window.location.reload();
-            // reset();
+            await instituteApi.update(instituteId, data);
+            toast.success(`${institute.name} updated`);
         } catch (err) {
-            toast.error("Sorry! Something went wrong.");
+            if (err.response.status === 409) {
+                setError(err.response.data?.message);
+            } else {
+                toast.error("Sorry! Something went wrong.");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
-    const resetForm = () => {
-        setFormData({
-            PartnerImages: "",
-            Partnername: "",
-            PartnerPhoneNo: "",
-            PartnerEmail: "",
-            InstituteName: "",
-            InstitutePhoneNo: null,
-            InstituteEmail: "",
-            website: "",
-            overallRating: null,
-            DemoVideoURL: "",
-            prize: null,
-            discountedPrice: null,
-            State: "",
-            Zone: "",
-        });
-    };
-
+    // input fields
     const inputFieldArr = [
         {
             label: "Partner's Name",
@@ -342,19 +360,51 @@ const AddInstitute = () => {
 
     // selected image remove handler
     const removeImageFromSelectedImages = (index) => {
+        if (loading) {
+            return;
+        }
         let images = [...selectedImages];
         images.splice(index, 1);
         setSelectedImages(images);
     }
 
+    // fetch institute and institute admin
+    useEffect(() => {
+        if (instituteId) {
+            (async () => {
+                try {
+                    const res = await instituteApi.readById(instituteId);
+                    const getInstitute = res.data;
+                    if (getInstitute) {
+                        for (let key in getInstitute) {
+                            setValue(key, getInstitute[key]);
+                            if (key === 'admin') {
+                                setValue('partnerName', getInstitute[key].name);
+                                setValue('partnerEmail', getInstitute[key].email);
+                                setValue('partnerPhoneNo', getInstitute[key].phoneNo);
+                            }
+                        }
+                        if (getInstitute.state) {
+                            setSelectedState(getInstitute.state);
+                        }
+                    }
+                    setInstitute(getInstitute);
+                } catch (err) {
+                    console.error(err);
+                }
+            })();
+        }
+    }, [instituteId]);
+
+
     return (
         <div className="">
             <form
                 className="flex flex-col bg-white my-28 mx-36 p-10 rounded-md shadow-xl"
-                onSubmit={handleSubmit(addInstitute)}
+                onSubmit={handleSubmit(institute ? updateInstitute : addInstitute)}
             >
                 <h1 className="text-xl text-center font-semibold mb-4 uppercase">
-                    Fill The Details To List the Institute
+                    {institute ? `Update ${institute?.name}` : 'Fill The Details To List the Institute'}
                 </h1>
                 <div className="w-full">
                     {inputFieldArr.map((item, index) => (
@@ -451,7 +501,8 @@ const AddInstitute = () => {
                                 >
                                     <Remove />
                                 </button>
-                                <img src={URL.createObjectURL(item)} className="w-full h-full object-cover" />
+                                {typeof item === 'object' && <img src={URL.createObjectURL(item)} className="w-full h-full object-cover" />}
+                                {typeof item !== 'object' && <Image src={item} className={"w-full h-full object-cover"} />}
                             </div>)}
                         </div>
                         <input onChange={imagesHandler} ref={imageFieldInput} type="file" multiple className="sr-only hidden" accept=".png, .webp, .jepg, .jpg" />
@@ -476,16 +527,32 @@ const AddInstitute = () => {
                             Add Images
                         </Button>
                     </div>
+                    {loading && <div className="mt-4 flex justify-center">
+                        <CircularProgress sx={{ '& circle': { stroke: '#0C3C82' } }} />
+                    </div>}
+                    {error && <p className="text-center text-red-500 font-medium text-sm mt-3">{error}</p>}
                 </div>
 
                 <Button
                     sx={{
-                        marginTop: "2vh",
+                        marginTop: "2rem",
+                        // backgroundColor: '#0C3C82',
+                        color: '#0C3C82',
+                        textTransform: 'capitalize',
+                        fontWeight: 500,
+                        padding: '0.4rem 2rem',
+                        border: '2px solid #0C3C82',
+                        '&:hover': {
+                            backgroundColor: '#0C3C82',
+                            color: 'white',
+                            border: '2px solid #0C3C82',
+                        }
                     }}
                     type="submit"
                     variant="outlined"
+                    disabled={loading}
                 >
-                    Submit
+                    {institute ? 'Update Institute' : 'Submit Institute'}
                 </Button>
             </form>
         </div>
