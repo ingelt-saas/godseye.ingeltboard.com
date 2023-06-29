@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useRef } from "react";
 import Compressor from "compressorjs";
 import { Remove } from "@mui/icons-material";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 const InputFieldStyle = {
     paddingTop: "10px",
@@ -52,9 +52,12 @@ const cityOptions = {
     ],
 };
 
-const InputField = ({ label, name, type, options, handleChange }) => {
+const InputField = ({ label, name, type, validation, options, Form }) => {
+
+    const { register, formState: { errors } } = Form;
+
     return (
-        <>
+        <div>
             {type === "select" && (
                 <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
                     <InputLabel id="demo-simple-select-standard-label">
@@ -67,8 +70,7 @@ const InputField = ({ label, name, type, options, handleChange }) => {
                         defaultValue=""
                         className="!capitalize"
                         sx={InputFieldStyle}
-                        onChange={handleChange}
-                        name={name} // Add the 'name' attribute
+                        {...register(name, validation)}
                     >
                         <MenuItem value="">
                             <em>None</em>
@@ -90,11 +92,11 @@ const InputField = ({ label, name, type, options, handleChange }) => {
                     variant="standard"
                     type={type}
                     sx={InputFieldStyle}
-                    onChange={handleChange}
-                    name={name} // Add the 'name' attribute
+                    {...register(name, validation)}
                 />
             )}
-        </>
+            {errors[name] && <span className="text-xs text-red-500 mt-1 font-medium">{errors[name].message}</span>}
+        </div>
     );
 };
 
@@ -119,10 +121,11 @@ const AddInstitute = () => {
     const [selectedImages, setSelectedImages] = useState([]);
     const imageFieldInput = useRef();
     const [defaultValues, setDefaultValues] = useState({});
+    const [selectedState, setSelectedState] = useState(null);
 
     // react-hook-form 
     const Form = useForm({ defaultValues: defaultValues });
-    const { handleSubmit, } = Form;
+    const { handleSubmit, control, formState: { errors }, reset } = Form;
 
     const handleChange = (e) => {
         setFormData({
@@ -131,29 +134,29 @@ const AddInstitute = () => {
         });
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
+    const addInstitute = async (data) => {
 
-    //     const Form = new FormData();
+        const Form = new FormData();
 
-    //     for (let image of selectedImages) {
-    //         Form.append('images', image);
-    //     }
+        for (let image of selectedImages) {
+            Form.append('images', image);
+        }
 
-    //     for (let key in formData) {
-    //         Form.append(key, formData[key]);
-    //     }
+        for (let key in data) {
+            Form.append(key, data[key]);
+        }
 
-    //     try {
-    //         await instituteApi.create(Form);
-    //         toast.success("Submitted.");
-    //         resetForm();
-    //         window.location.reload();
-    //         // reset();
-    //     } catch (err) {
-    //         toast.error("Sorry! Something went wrong.");
-    //     }
-    // };
+        try {
+            await instituteApi.create(Form);
+            toast.success("Submitted.");
+            reset();
+            setSelectedImages([]);
+            // window.location.reload();
+            // reset();
+        } catch (err) {
+            toast.error("Sorry! Something went wrong.");
+        }
+    };
 
     const resetForm = () => {
         setFormData({
@@ -179,12 +182,16 @@ const AddInstitute = () => {
             label: "Partner's Name",
             name: "partnerName",
             type: "text",
+            validation: {
+                required: 'Partner name is required',
+            }
         },
         {
             label: "Partner's Phone",
             name: "partnerPhoneNo",
             type: "tel",
             validation: {
+                required: 'Partner phone number is required',
                 pattern: {
                     value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
                     message: "Invalid phone number",
@@ -196,6 +203,7 @@ const AddInstitute = () => {
             name: "partnerEmail",
             type: "email",
             validation: {
+                required: 'Partner email is required',
                 pattern: {
                     value: /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/,
                     message: "Invalid email address",
@@ -206,12 +214,16 @@ const AddInstitute = () => {
             label: "Institute's Name",
             name: "name",
             type: "text",
+            validation: {
+                required: 'Institute name is required',
+            }
         },
         {
             label: "Institute's Phone",
             name: "phoneNo",
             type: "tel",
             validation: {
+                required: 'Institute phone number is required',
                 pattern: {
                     value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
                     message: "Invalid phone number",
@@ -223,6 +235,7 @@ const AddInstitute = () => {
             name: "email",
             type: "email",
             validation: {
+                required: 'Institute email is required',
                 pattern: {
                     value: /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/,
                     message: "Invalid email address",
@@ -234,6 +247,7 @@ const AddInstitute = () => {
             name: "website",
             type: "text",
             validation: {
+                required: false,
                 pattern: {
                     value: /^(ftp|http|https):\/\/[^ "]+$/,
                     message: "Please provide valid url",
@@ -243,19 +257,41 @@ const AddInstitute = () => {
         {
             label: "Address",
             name: "address",
-            type: "text"
+            type: "text",
+            validation: {
+                required: false,
+            }
         },
         {
             label: "Rating",
             name: "overallRating",
             type: "text",
-
+            validation: {
+                required: false,
+                pattern: {
+                    value: /^(?:9(?:\.[0]*)?|[0-8](?:\.\d+)?)$/,
+                    message: 'Invalid score, score should be like 2.4 or 5',
+                }
+            }
         },
         {
             label: "Demo video URL",
             name: "DemoVideoURL",
             type: "text",
             validation: {
+                required: false,
+                pattern: {
+                    value: /^(ftp|http|https):\/\/[^ "]+$/,
+                    message: "Please provide valid url",
+                },
+            },
+        },
+        {
+            label: "Embed URL",
+            name: "embedUrl",
+            type: "text",
+            validation: {
+                required: false,
                 pattern: {
                     value: /^(ftp|http|https):\/\/[^ "]+$/,
                     message: "Please provide valid url",
@@ -266,11 +302,17 @@ const AddInstitute = () => {
             label: "Prize",
             name: "fee",
             type: "number",
+            validation: {
+                required: 'Prize is required',
+            }
         },
         {
             label: "Discounted Price",
             name: "discountedFee",
             type: "number",
+            validation: {
+                required: false,
+            }
         },
     ];
 
@@ -309,7 +351,7 @@ const AddInstitute = () => {
         <div className="">
             <form
                 className="flex flex-col bg-white my-28 mx-36 p-10 rounded-md shadow-xl"
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(addInstitute)}
             >
                 <h1 className="text-xl text-center font-semibold mb-4 uppercase">
                     Fill The Details To List the Institute
@@ -319,64 +361,86 @@ const AddInstitute = () => {
                         <InputField
                             key={index}
                             {...item}
-                            handleChange={handleChange} // Pass the handleChange function as prop
+                            Form={Form}
                         />
                     ))}
 
-                    <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
-                        <InputLabel id="demo-simple-select-standard-label">
-                            State
-                        </InputLabel>
-                        <Select
-                            labelId="demo-simple-select-standard-label"
-                            id="demo-simple-select-standard"
-                            label="State"
-                            // defaultValue=""
-                            className="!capitalize"
-                            sx={InputFieldStyle}
-                            onChange={handleChange}
-                            name="State" // Add the 'name' attribute
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            {Array.isArray(Object.keys(cityOptions)) &&
-                                Object.keys(cityOptions).map((item) => (
-                                    <MenuItem key={item} value={item} className="!capitalize">
-                                        {item}
+                    <div>
+                        <Controller
+                            name="state"
+                            rules={{ required: 'State is required' }}
+                            control={control}
+                            render={({ field: { value, onChange, name } }) => <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
+                                <InputLabel id="demo-simple-select-standard-label">
+                                    State
+                                </InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-standard-label"
+                                    id="demo-simple-select-standard"
+                                    label="State"
+                                    className="!capitalize"
+                                    sx={InputFieldStyle}
+                                    onChange={(e) => {
+                                        setSelectedState(e.target.value);
+                                        onChange(e);
+                                    }}
+                                    value={value || ''}
+                                    name={name} // Add the 'name' attribute
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
                                     </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
-                        <InputLabel id="demo-simple-select-standard-label">Zone</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-standard-label"
-                            id="demo-simple-select-standard"
-                            label="Zone"
-                            className="!capitalize"
-                            sx={InputFieldStyle}
-                            onChange={handleChange}
-                            name="Zone" // Add the 'name' attribute
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            {formData.State === "Delhi" &&
-                                cityOptions["Delhi"].map((item) => (
-                                    <MenuItem key={item} value={item} className="!capitalize">
-                                        {item}
+                                    {Array.isArray(Object.keys(cityOptions)) &&
+                                        Object.keys(cityOptions).map((item) => (
+                                            <MenuItem key={item} value={item} className="!capitalize">
+                                                {item}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </FormControl>}
+                        />
+                        {errors?.state && <span className="text-xs text-red-500 mt-1 font-medium">{errors.state.message}</span>}
+                    </div>
+
+                    <div>
+                        <Controller
+                            name="zone"
+                            rules={{ required: 'Zone is required' }}
+                            control={control}
+                            render={({ field: { value, onChange, name } }) => <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
+                                <InputLabel id="demo-simple-select-standard-label">Zone</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-standard-label"
+                                    id="demo-simple-select-standard"
+                                    label="Zone"
+                                    className="!capitalize"
+                                    sx={InputFieldStyle}
+                                    name={name}
+                                    value={value || ''}
+                                    onChange={onChange}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
                                     </MenuItem>
-                                ))}
-                            {formData.State === "Punjab" &&
-                                Array.isArray(Object.keys(cityOptions)) &&
-                                cityOptions["Punjab"].map((item) => (
-                                    <MenuItem key={item} value={item} className="!capitalize">
-                                        {item}
-                                    </MenuItem>
-                                ))}
-                        </Select>
-                    </FormControl>
+                                    {selectedState === "Delhi" &&
+                                        cityOptions["Delhi"].map((item) => (
+                                            <MenuItem key={item} value={item} className="!capitalize">
+                                                {item}
+                                            </MenuItem>
+                                        ))}
+                                    {selectedState === "Punjab" &&
+                                        Array.isArray(Object.keys(cityOptions)) &&
+                                        cityOptions["Punjab"].map((item) => (
+                                            <MenuItem key={item} value={item} className="!capitalize">
+                                                {item}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </FormControl>}
+                        />
+                        {errors?.zone && <span className="text-xs text-red-500 mt-1 font-medium">{errors.zone.message}</span>}
+                    </div>
+
                     <div className="mt-4">
                         <div className="flex flex-wrap gap-4 mb-4">
                             {selectedImages.map((item, index) => <div className="w-40 h-40 border-2 overflow-hidden cursor-pointer relative rounded-lg" key={index}>
