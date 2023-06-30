@@ -177,10 +177,7 @@ const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
                             }
                         }}
                         endIcon={<Edit />}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/institute?page=add-institute&id=${id}`);
-                        }}
+                        onClick={() => navigate(`/institute?page=add-institute&id=${id}`)}
                     >Update</Button>
                     <Button
                         variant="outlined"
@@ -196,10 +193,7 @@ const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
                             }
                         }}
                         endIcon={<Delete />}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteConfirm(institute);
-                        }}
+                        onClick={() => setDeleteConfirm(institute)}
                     >Delete</Button>
                 </div>
             </div>
