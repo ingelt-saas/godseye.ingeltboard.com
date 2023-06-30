@@ -17,12 +17,14 @@ import 'swiper/css';
 import img4 from '../../assets/discount.svg';
 import phoneSVG from '../../assets/phone.svg';
 import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
 
     // const prevRef = useRef();
     // const nextRef = useRef();
     const [thumbsSwiper, setThumbsSwiper] = useState(null);
+    const navigate = useNavigate();
 
     // destructuring institute object
     const {
@@ -177,7 +179,7 @@ const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
                         endIcon={<Edit />}
                         onClick={(e) => {
                             e.stopPropagation();
-                            // navigate(`/modules/add?id=${item.id}`);
+                            navigate(`/institute?page=add-institute&id=${id}`);
                         }}
                     >Update</Button>
                     <Button
