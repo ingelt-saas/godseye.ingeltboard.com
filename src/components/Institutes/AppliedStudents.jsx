@@ -7,7 +7,7 @@ import getFile from "../../api/getFile";
 import moment from "moment";
 import { toast } from "react-toastify";
 
-const StudentImage = ({ student, className }) => {
+export const StudentImage = ({ student, className }) => {
 
     const [url, setUrl] = useState(null);
 
