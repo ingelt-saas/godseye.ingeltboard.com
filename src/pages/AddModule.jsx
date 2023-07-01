@@ -38,7 +38,7 @@ const AddModule = () => {
     const [selectedThumbnail, setSelectedThumbnail] = useState(null);
     const [moduleError, setModuleError] = useState('');
     const [thumbnailError, setThumbnailError] = useState('');
-    const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null });
+    const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null, order: '' });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [videoProgress, setVideoProgress] = useState(null);
@@ -146,6 +146,7 @@ const AddModule = () => {
         formData.subject = moduleData.subject;
         formData.description = moduleData.description;
         formData.name = moduleData.name;
+        formData.order = moduleData.order;
 
         if (moduleData.releaseDate) {
             formData.releaseDate = moduleData.releaseDate;
@@ -156,7 +157,7 @@ const AddModule = () => {
             toast.success('Module added successfully');
             setSelectedModule(null);
             setSelectedThumbnail(null);
-            setModuleData({ name: '', description: '', subject: '', releaseDate: null });
+            setModuleData({ name: '', description: '', subject: '', releaseDate: null, order: '' });
             setImageProgress(null);
             setVideoProgress(null);
         } catch (err) {
@@ -188,9 +189,9 @@ const AddModule = () => {
         if (!moduleData.subject) {
             newErrors.subject = 'Module subject is required';
         }
-        if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
-            newErrors.releaseDate = 'Release date should be greater than the current date and time';
-        }
+        // if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
+        //     newErrors.releaseDate = 'Release date should be greater than the current date and time';
+        // }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -234,6 +235,7 @@ const AddModule = () => {
         formData.subject = moduleData.subject;
         formData.description = moduleData.description;
         formData.name = moduleData.name;
+        formData.order = moduleData.order;
 
         if (moduleData.releaseDate) {
             formData.releaseDate = moduleData.releaseDate;
@@ -360,6 +362,24 @@ const AddModule = () => {
                                     <MenuItem value='Writing'>Writing</MenuItem>
                                     <MenuItem value='Speaking'>Speaking</MenuItem>
                                     <MenuItem value='Listening'>Listening</MenuItem>
+                                </Select>
+                            </FormControl>
+                            {errors?.subject && <span className="mt-1 text-xs text-red-500">{errors.subject}</span>}
+                        </div>
+
+                        <div className="">
+                            <FormControl fullWidth size="small">
+                                <InputLabel id="demo-select-small-label">Order</InputLabel>
+                                <Select
+                                    labelId="demo-select-small-label"
+                                    id="demo-select-small"
+                                    value={moduleData.order}
+                                    label="Order"
+                                    onChange={(e) => setModuleData({ ...moduleData, order: e.target.value })}
+                                >
+                                    <MenuItem value='1'>First</MenuItem>
+                                    <MenuItem value='2'>Second</MenuItem>
+                                    <MenuItem value='3'>Third</MenuItem>
                                 </Select>
                             </FormControl>
                             {errors?.subject && <span className="mt-1 text-xs text-red-500">{errors.subject}</span>}
