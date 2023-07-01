@@ -180,7 +180,6 @@ const AddUniversity = ({ refetch }) => {
         }
     }
 
-
     // fetch university by id
     useEffect(() => {
         if (universityId) {
@@ -195,6 +194,7 @@ const AddUniversity = ({ refetch }) => {
                         setValue('courseDuration', university.courseDuration);
                         setValue('address', university.address);
                         setValue('areaOfInterest', university.areaOfInterest);
+                        setValue('courseLevel', university.courseLevel);
                         university.logo && setSelectedLogo(university.logo);
                     }
                     setUniversity(university);
@@ -217,6 +217,47 @@ const AddUniversity = ({ refetch }) => {
                             Form={Form}
                         />
                     )}
+                    <div>
+                        <Controller
+                            name='courseLevel'
+                            control={control}
+                            rules={{ required: 'Course level is required' }}
+                            render={({ field: { value, onChange } }) => <FormControl variant="standard" fullWidth>
+                                <InputLabel
+                                    id="demo-simple-select-standard-label"
+                                    className="!text-sm !pl-3"
+                                    sx={{
+                                        '&.Mui-focused': {
+                                            color: '#001E43 !important',
+                                        }
+                                    }}
+                                >Course Level</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-standard-label"
+                                    id="demo-simple-select-standard"
+                                    value={value || ''}
+                                    onChange={onChange}
+                                    sx={{
+                                        '& .MuiInput-underline:after': {
+                                            borderColor: '#001E43 !important',
+                                        },
+                                        '&:after': {
+                                            borderBottom: '2px solid #001E43 !important',
+                                            // color: ' !important',
+                                        }
+                                    }}
+                                    label="Course Level"
+                                    MenuProps={{ sx: { maxHeight: '70vh' } }}
+                                >
+                                    <MenuItem value={''}><em>None</em></MenuItem>
+                                    {['High School (11th -12th)', 'UG Diploma/ Certificate', 'UG', 'PG Diploma/ Certificate', 'PG', 'PhD'].map((item, index) =>
+                                        <MenuItem key={index} value={item}>{item}</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>}
+                        />
+                        {errors?.courseLevel && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.courseLevel?.message}</p>}
+                    </div>
                     <div>
                         <Controller
                             name='areaOfInterest'
