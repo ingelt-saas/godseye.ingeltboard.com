@@ -12,7 +12,7 @@ import getFile from "../api/getFile";
 import moment from 'moment';
 import uploadToAWS from "../aws/upload";
 
-const ModuleThumbnail = ({ setThumbnail, setThumbnailError }) => {
+const ModuleThumbnail = ({ setThumbnail, setThumbnailError, selectedThumbnail }) => {
 
     const onDrop = useCallback((acceptFile, rejectFile) => {
         if (rejectFile.length > 0) {
@@ -26,9 +26,12 @@ const ModuleThumbnail = ({ setThumbnail, setThumbnailError }) => {
     const { getInputProps, getRootProps } = useDropzone({ onDrop, accept: { 'image/*': [] }, multiple: false });
     return (<div {...getRootProps()}>
         <input {...getInputProps()} />
-        <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
+        {selectedThumbnail && typeof selectedThumbnail === 'string' && <Image src={selectedThumbnail} alt='' className={'w-full h-auto'} />}
+        {selectedThumbnail && typeof selectedThumbnail === 'object' && <img src={URL.createObjectURL(selectedThumbnail)} alt='' className='w-full h-auto' />}
+        {!selectedThumbnail && <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
             <p>Drag 'n' drop module thumbnail here, or click to select module thumbnail</p>
         </div>
+        }
     </div>);
 }
 
@@ -291,38 +294,40 @@ const AddModule = () => {
             <div className="flex gap-x-5 max-md:flex-col max-md:gap-y-5 mt-10">
                 <div className="md:w-1/2">
                     <div className="w-full">
-                        {selectedModule && <ReactPlayer
-                            url={typeof selectedModule === 'object' ? URL.createObjectURL(selectedModule) : getFile(selectedModule).then(res => res.data)}
-                            style={{ borderRadius: '10px', overflow: 'hidden' }}
-                            playing={false}
-                            width="100%"
-                            height="100%"
-                            volume={1}
-                            pip={true}
-                            controls
-                            config={{
-                                file: {
-                                    attributes: {
-                                        controlsList: 'nodownload',
-                                    },
-                                },
-                            }}
-                        />}
-                        {!selectedModule && <div {...getRootProps()}>
+
+                        <div {...getRootProps()}>
                             <input {...getInputProps()} />
-                            <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
+                            {selectedModule && <ReactPlayer
+                                url={typeof selectedModule === 'object' ? URL.createObjectURL(selectedModule) : getFile(selectedModule).then(res => res.data)}
+                                style={{ borderRadius: '10px', overflow: 'hidden' }}
+                                playing={false}
+                                width="100%"
+                                height="100%"
+                                volume={1}
+                                pip={true}
+                                controls
+                                config={{
+                                    file: {
+                                        attributes: {
+                                            controlsList: 'nodownload',
+                                        },
+                                    },
+                                }}
+                            />}
+
+                            {!selectedModule && <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
                                 <p>Drag 'n' drop module here, or click to select module</p>
-                            </div>
-                        </div>}
+                            </div>}
+                        </div>
+
                         {moduleError && <p className="text-sm mt-3 font-medium text-center text-red-500 ">{moduleError}</p>}
                     </div>
                     <div className="w-full mt-10">
-                        {selectedThumbnail && typeof selectedThumbnail === 'string' && <Image src={selectedThumbnail} alt='' className={'w-full h-auto'} />}
-                        {selectedThumbnail && typeof selectedThumbnail === 'object' && <img src={URL.createObjectURL(selectedThumbnail)} alt='' className='w-full h-auto' />}
-                        {!selectedThumbnail && <ModuleThumbnail
+                        <ModuleThumbnail
                             setThumbnail={setSelectedThumbnail}
                             setThumbnailError={setThumbnailError}
-                        />}
+                            selectedThumbnail={selectedThumbnail}
+                        />
                         {thumbnailError && <p className="text-sm mt-3 font-medium text-center text-red-500 ">{thumbnailError}</p>}
                         {errors?.thumbnail && <span className="mt-1 text-xs text-red-500">{errors.thumbnail}</span>}
                     </div>
