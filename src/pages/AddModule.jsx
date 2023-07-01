@@ -106,9 +106,15 @@ const AddModule = () => {
         if (!moduleData.name) {
             newErrors.name = 'Module name is required';
         }
+
         if (!moduleData.subject) {
             newErrors.subject = 'Module subject is required';
         }
+
+        if (!moduleData.order) {
+            newErrors.order = 'Module order is required';
+        }
+
         if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
             newErrors.releaseDate = 'Release date should be greater than the current date and time';
         }
@@ -189,6 +195,11 @@ const AddModule = () => {
         if (!moduleData.subject) {
             newErrors.subject = 'Module subject is required';
         }
+
+        if (!moduleData.order) {
+            newErrors.order = 'Module order is required';
+        }
+
         // if (moduleData.releaseDate && (releaseDate.getTime() < currentDateTime.getTime())) {
         //     newErrors.releaseDate = 'Release date should be greater than the current date and time';
         // }
@@ -368,21 +379,16 @@ const AddModule = () => {
                         </div>
 
                         <div className="">
-                            <FormControl fullWidth size="small">
-                                <InputLabel id="demo-select-small-label">Order</InputLabel>
-                                <Select
-                                    labelId="demo-select-small-label"
-                                    id="demo-select-small"
-                                    value={moduleData.order}
-                                    label="Order"
-                                    onChange={(e) => setModuleData({ ...moduleData, order: e.target.value })}
-                                >
-                                    <MenuItem value='1'>First</MenuItem>
-                                    <MenuItem value='2'>Second</MenuItem>
-                                    <MenuItem value='3'>Third</MenuItem>
-                                </Select>
-                            </FormControl>
-                            {errors?.subject && <span className="mt-1 text-xs text-red-500">{errors.subject}</span>}
+                            <TextField
+                                fullWidth
+                                type="number"
+                                size="small"
+                                label='Order'
+                                name="order"
+                                value={moduleData.order}
+                                onChange={(e) => setModuleData({ ...moduleData, order: e.target.value })}
+                            />
+                            {errors?.order && <span className="mt-1 text-xs text-red-500">{errors.order}</span>}
                         </div>
 
                         <div className="">

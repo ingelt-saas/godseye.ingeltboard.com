@@ -2,11 +2,15 @@
 // area of interest list
 const areaOfInterestList = [
     {
-        name: "Business & Management",
+        name: "All",
+        // img: '',
+    },
+    {
+        name: "Commerce, Business & Administration",
         // img: Business,
     },
     {
-        name: "Social Sciences",
+        name: "Social and Behavioural Science",
         // img: social,
     },
     {
@@ -14,11 +18,11 @@ const areaOfInterestList = [
         // img: computer,
     },
     {
-        name: "Mathematics",
+        name: "Mathematics and Statistics",
         // img: maths,
     },
     {
-        name: "Engineering",
+        name: "Engineering and Engineering Trades",
         // img: engineer,
     },
     {
@@ -30,16 +34,12 @@ const areaOfInterestList = [
         // img: medicine,
     },
     {
-        name: "Architecture",
+        name: "Architecture and Building",
         // img: architecture,
     },
     {
         name: "Agriculture",
         // img: agriculture,
-    },
-    {
-        name: "Professional Studies",
-        // img: professional,
     },
     {
         name: "Media & Journalism",
@@ -54,15 +54,7 @@ const areaOfInterestList = [
         // img: law,
     },
     {
-        name: "Science",
-        // img: science,
-    },
-    {
-        name: "Sports",
-        // img: sports,
-    },
-    {
-        name: "Hospitality",
+        name: "Physical and Life Sciences",
         // img: hospitality,
     },
     {
