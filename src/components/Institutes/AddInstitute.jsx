@@ -389,6 +389,9 @@ const AddInstitute = () => {
                         }
                     }
                     setInstitute(getInstitute);
+                    let orgImages = getInstitute.orgImages;
+                    orgImages = orgImages.map(i => i.name);
+                    setSelectedImages(orgImages);
                 } catch (err) {
                     console.error(err);
                 }
@@ -414,6 +417,38 @@ const AddInstitute = () => {
                             Form={Form}
                         />
                     ))}
+
+                    <div>
+                        <Controller
+                            name="modeOfClasses"
+                            rules={{ required: 'Mode of institute is required' }}
+                            control={control}
+                            render={({ field: { value, onChange, name } }) => <FormControl variant="standard" sx={{ width: "100%", mt: 1 }}>
+                                <InputLabel id="demo-simple-select-standard-label">
+                                    Mode of Institute
+                                </InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-standard-label"
+                                    id="demo-simple-select-standard"
+                                    label="Mode of Institute"
+                                    className="!capitalize"
+                                    sx={InputFieldStyle}
+                                    onChange={onChange}
+                                    value={value || ''}
+                                    name={name} // Add the 'name' attribute
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value="online">Online</MenuItem>
+                                    <MenuItem value="offline">Offline</MenuItem>
+                                    <MenuItem value="hybrid">Hybrid</MenuItem>
+
+                                </Select>
+                            </FormControl>}
+                        />
+                        {errors?.modeOfClasses && <span className="text-xs text-red-500 mt-1 font-medium">{errors.modeOfClasses.message}</span>}
+                    </div>
 
                     <div>
                         <Controller
