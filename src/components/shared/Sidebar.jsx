@@ -87,6 +87,11 @@ const SideBar = () => {
             label: "Blogs",
             icon: <DiscussionSVG />,
         },
+        {
+            path: "/students",
+            label: "Students",
+            icon: <DiscussionSVG />,
+        },
     ];
 
     return (

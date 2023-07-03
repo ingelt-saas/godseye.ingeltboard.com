@@ -11,6 +11,7 @@ import { AdminContext } from "../contexts";
 import LoginLayout from "../layouts/LoginLayout";
 import Loader from '../components/shared/Loader';
 import Blogs from "../pages/Blogs";
+import Students from "../pages/Students";
 
 const Routes = () => {
 
@@ -48,6 +49,10 @@ const Routes = () => {
                 {
                     path: '/blogs',
                     element: <Blogs />
+                },
+                {
+                    path: '/students',
+                    element: <Students />
                 },
             ]
         }
