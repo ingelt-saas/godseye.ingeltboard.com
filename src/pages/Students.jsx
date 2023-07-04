@@ -8,6 +8,7 @@ import { StudentImage } from "../components/Institutes/AppliedStudents";
 import { Delete } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
+import StudentInfoModal from "../components/Student/StudentInfoModal";
 
 const Students = () => {
 
@@ -15,6 +16,7 @@ const Students = () => {
     const [pagination, setPagination] = useState({ page: 1, limit: 50 });
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [studentInfo, setStudentInfo] = useState(null);
 
     const { data: students = [], isLoading, refetch } = useQuery({
         queryKey: ['students', pagination, searchQuery, filter],
@@ -48,10 +50,25 @@ const Students = () => {
         }
     }
 
+    // search handler
+    const searchHandler = (e) => {
+        e.preventDefault();
+        setSearchQuery(e.target.search.value);
+        setPagination({ page: 1, limit: 50 });
+    }
+
     return (
         <div className="px-5">
             <h1 className="pb-2 border-b text-3xl font-medium">InGelt Students</h1>
             <div className="mt-10">
+
+                <div className="flex mb-10 justify-between">
+                    <div></div>
+                    <form className="flex items-center" onSubmit={searchHandler}>
+                        <input name="search" className="border-2 rounded-md rounded-r-none border-r-0 py-2 px-4 outline-none w-[300px] text-sm" placeholder="Search by student or institute" />
+                        <button className="text-sm px-5 py-2 border border-[#001E43] bg-[#001E43] text-white">Search</button>
+                    </form>
+                </div>
 
                 {/* loading animation */}
                 {isLoading && <div className="flex justify-center py-5">
@@ -61,9 +78,9 @@ const Students = () => {
                 {!isLoading && (Array.isArray(students?.rows) && students?.rows?.length ?
                     <div>
                         <div className="grid grid-cols-3 gap-6">
-                            {students.rows?.map(({ id, name, image, email, gender, dob, organization }) =>
-                                <div className='flex flex-col gap-y-4 border cursor-pointer border-[#E1E1E1] py-4 px-4 shadow-md bg-white items-start rounded-lg' key={id}>
-                                    <StudentImage student={{ image, name }} />
+                            {students.rows?.map(student =>
+                                <div onClick={() => setStudentInfo(student)} className='flex flex-col gap-y-4 border cursor-pointer border-[#E1E1E1] py-4 px-4 shadow-md bg-white items-start rounded-lg' key={student?.id}>
+                                    <StudentImage student={student} />
                                     <div className="w-full flex-1">
                                         <table className="w-full !text-sm">
                                             <tbody>
@@ -71,29 +88,29 @@ const Students = () => {
                                                     <td className="font-semibold pr-2">
                                                         <span className="flex items-start justify-between w-full">Name<span>:</span></span>
                                                     </td>
-                                                    <td>{name}</td>
+                                                    <td>{student?.name}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-semibold pr-2">
                                                         <span className="flex items-start justify-between w-full">Email<span>:</span></span>
                                                     </td>
-                                                    <td>{email}</td>
+                                                    <td>{student?.email}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-semibold pr-2">
                                                         <span className="flex items-start justify-between w-full">Gender<span>:</span></span>
                                                     </td>
-                                                    <td>{gender || 'Not Set'}</td>
+                                                    <td>{student?.gender || 'Not Set'}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="font-semibold pr-2">
                                                         <span className="flex items-start justify-between w-full">DOB<span>:</span></span>
                                                     </td>
-                                                    <td>{dob ? moment(dob).format('ll') : 'Not Set'}</td>
+                                                    <td>{student?.dob ? moment(student?.dob).format('ll') : 'Not Set'}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        {organization && <p className="text-sm mt-2">Student of <strong>{organization?.name}</strong></p>}
+                                        {student?.organization && <p className="text-sm mt-2">Student of <strong>{student?.organization?.name}</strong></p>}
                                     </div>
                                     <Button
                                         variant="outlined"
@@ -110,7 +127,7 @@ const Students = () => {
                                         endIcon={<Delete />}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setDeleteConfirm({ name, id });
+                                            setDeleteConfirm(student);
                                         }}
                                     >Delete</Button>
                                 </div>
@@ -135,6 +152,12 @@ const Students = () => {
                     name={'student'}
                     confirmHandler={deleteStudent}
                 />
+                {/* student info modal */}
+                {studentInfo && <StudentInfoModal
+                    open={Boolean(studentInfo)}
+                    close={() => setStudentInfo(null)}
+                    data={studentInfo}
+                />}
 
             </div>
         </div>

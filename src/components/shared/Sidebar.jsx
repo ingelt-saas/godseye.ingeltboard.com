@@ -92,6 +92,11 @@ const SideBar = () => {
             label: "Students",
             icon: <DiscussionSVG />,
         },
+        {
+            path: "/loan-query",
+            label: "Loan Query",
+            icon: <DiscussionSVG />,
+        },
     ];
 
     return (

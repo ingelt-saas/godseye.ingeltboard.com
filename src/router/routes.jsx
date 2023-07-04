@@ -12,6 +12,7 @@ import LoginLayout from "../layouts/LoginLayout";
 import Loader from '../components/shared/Loader';
 import Blogs from "../pages/Blogs";
 import Students from "../pages/Students";
+import LoanQuery from "../pages/LoanQuery";
 
 const Routes = () => {
 
@@ -53,6 +54,10 @@ const Routes = () => {
                 {
                     path: '/students',
                     element: <Students />
+                },
+                {
+                    path: '/loan-query',
+                    element: <LoanQuery />
                 },
             ]
         }
