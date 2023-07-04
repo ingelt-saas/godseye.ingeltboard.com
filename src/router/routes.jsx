@@ -15,6 +15,7 @@ import Students from "../pages/Students";
 import LoanQuery from "../pages/LoanQuery";
 import UniversitiesQuery from "../pages/UniversitiesQuery";
 import VisaQuery from "../pages/VisaQuery";
+import Discussions from "../pages/Discussions";
 
 const Routes = () => {
 
@@ -52,6 +53,10 @@ const Routes = () => {
                 {
                     path: '/blogs',
                     element: <Blogs />
+                },
+                {
+                    path: '/discussion',
+                    element: <Discussions />
                 },
                 {
                     path: '/students',
