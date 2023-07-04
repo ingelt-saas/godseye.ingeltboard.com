@@ -3,6 +3,7 @@ import AdminProvider from "./providers/AdminProvider";
 import Routes from "./router/routes";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { SocketContext, socket } from "./contexts";
 
 const App = () => {
 
@@ -11,10 +12,12 @@ const App = () => {
   return (
     <>
       <QueryClientProvider client={client}>
-        <AdminProvider>
-          <Routes />
-          <ToastContainer />
-        </AdminProvider>
+        <SocketContext.Provider value={socket}>
+          <AdminProvider>
+            <Routes />
+            <ToastContainer />
+          </AdminProvider>
+        </SocketContext.Provider>
       </QueryClientProvider>
     </>
   );
