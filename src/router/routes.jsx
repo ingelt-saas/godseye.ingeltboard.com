@@ -11,6 +11,10 @@ import { AdminContext } from "../contexts";
 import LoginLayout from "../layouts/LoginLayout";
 import Loader from '../components/shared/Loader';
 import Blogs from "../pages/Blogs";
+import Students from "../pages/Students";
+import LoanQuery from "../pages/LoanQuery";
+import UniversitiesQuery from "../pages/UniversitiesQuery";
+import VisaQuery from "../pages/VisaQuery";
 
 const Routes = () => {
 
@@ -48,6 +52,22 @@ const Routes = () => {
                 {
                     path: '/blogs',
                     element: <Blogs />
+                },
+                {
+                    path: '/students',
+                    element: <Students />
+                },
+                {
+                    path: '/loan-query',
+                    element: <LoanQuery />
+                },
+                {
+                    path: '/university-query',
+                    element: <UniversitiesQuery />
+                },
+                {
+                    path: '/visa-query',
+                    element: <VisaQuery />
                 },
             ]
         }
