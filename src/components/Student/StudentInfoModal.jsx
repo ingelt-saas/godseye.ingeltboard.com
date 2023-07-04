@@ -30,6 +30,12 @@ const StudentInfoModal = ({ open, close, data }) => {
                             </tr>
                             <tr>
                                 <td className="font-semibold pr-2">
+                                    <span className="flex items-start justify-between w-full">Phone Number<span>:</span></span>
+                                </td>
+                                <td>{data?.phoneNo}</td>
+                            </tr>
+                            <tr>
+                                <td className="font-semibold pr-2">
                                     <span className="flex items-start justify-between w-full">Gender<span>:</span></span>
                                 </td>
                                 <td>{data?.gender || 'Not Set'}</td>

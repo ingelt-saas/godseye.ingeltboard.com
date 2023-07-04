@@ -97,6 +97,16 @@ const SideBar = () => {
             label: "Loan Query",
             icon: <DiscussionSVG />,
         },
+        {
+            path: "/university-query",
+            label: "Universities Query",
+            icon: <DiscussionSVG />,
+        },
+        {
+            path: "/visa-query",
+            label: "Visa Query",
+            icon: <DiscussionSVG />,
+        },
     ];
 
     return (

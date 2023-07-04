@@ -98,6 +98,12 @@ const Students = () => {
                                                 </tr>
                                                 <tr>
                                                     <td className="font-semibold pr-2">
+                                                        <span className="flex items-start justify-between w-full">Phone NO<span>:</span></span>
+                                                    </td>
+                                                    <td>{student?.phoneNo}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="font-semibold pr-2">
                                                         <span className="flex items-start justify-between w-full">Gender<span>:</span></span>
                                                     </td>
                                                     <td>{student?.gender || 'Not Set'}</td>
