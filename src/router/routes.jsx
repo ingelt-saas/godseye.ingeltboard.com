@@ -5,7 +5,6 @@ import Modules from "../pages/Modules";
 import Library from "../pages/Library";
 import AddModule from "../pages/AddModule";
 import Institute from "../pages/Institute";
-import ShortlistUniversity from "../pages/ShortlistUniversity";
 import { useContext } from "react";
 import { AdminContext } from "../contexts";
 import LoginLayout from "../layouts/LoginLayout";
@@ -16,6 +15,7 @@ import LoanQuery from "../pages/LoanQuery";
 import UniversitiesQuery from "../pages/UniversitiesQuery";
 import VisaQuery from "../pages/VisaQuery";
 import Discussions from "../pages/Discussions";
+import Universities from "../pages/Universities";
 
 const Routes = () => {
 
@@ -43,8 +43,8 @@ const Routes = () => {
                     element: <Library />
                 },
                 {
-                    path: '/shortlist-university',
-                    element: <ShortlistUniversity />
+                    path: '/university',
+                    element: <Universities />
                 },
                 {
                     path: '/institute',
@@ -65,10 +65,6 @@ const Routes = () => {
                 {
                     path: '/loan-query',
                     element: <LoanQuery />
-                },
-                {
-                    path: '/university-query',
-                    element: <UniversitiesQuery />
                 },
                 {
                     path: '/visa-query',

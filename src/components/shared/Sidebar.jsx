@@ -73,8 +73,8 @@ const SideBar = () => {
             icon: <LibrarySVG />,
         },
         {
-            path: "/shortlist-university",
-            label: "Shortlist University",
+            path: "/university",
+            label: "University",
             icon: <LibrarySVG />,
         },
         {
@@ -95,11 +95,6 @@ const SideBar = () => {
         {
             path: "/loan-query",
             label: "Loan Query",
-            icon: <DiscussionSVG />,
-        },
-        {
-            path: "/university-query",
-            label: "Universities Query",
             icon: <DiscussionSVG />,
         },
         {
