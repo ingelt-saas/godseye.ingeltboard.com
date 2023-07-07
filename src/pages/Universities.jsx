@@ -9,8 +9,9 @@ import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import { toast } from "react-toastify";
 import PaginationComponent from "../components/shared/PaginationComponent";
 import StudentsShortlist from "../components/ShortlistUniversity/StudentsShortlist";
+import Courses from "../components/ShortlistUniversity/Courses";
 
-const ShortlistUniversity = () => {
+const Universities = () => {
 
     const [search, setSearch] = useSearchParams();
     const page = search.get('page');
@@ -98,6 +99,32 @@ const ShortlistUniversity = () => {
                     Add University
                 </Button>
                 <Button
+                    onClick={() => setSearch({ page: 'courses' }, { replace: true })}
+                    sx={{
+                        bgColor: 'transparent',
+                        color: page === 'courses' ? 'black' : '#00000099',
+                        textTransform: 'capitalize',
+                        fontWeight: 600,
+                        padding: '0.8rem 1.5rem',
+                        fontSize: '0.8rem',
+                        position: 'relative',
+                        '&:hover': {
+                            bgColor: 'transparent !important',
+                        },
+                        '&:after': {
+                            content: '""',
+                            height: '4px',
+                            width: '100%',
+                            position: 'absolute',
+                            bottom: '-4px',
+                            left: '0',
+                            backgroundColor: page === 'courses' ? 'black' : 'transparent',
+                        }
+                    }}
+                >
+                    Courses
+                </Button>
+                <Button
                     onClick={() => setSearch({ page: 'students-shortlist' }, { replace: true })}
                     sx={{
                         bgColor: 'transparent',
@@ -127,7 +154,8 @@ const ShortlistUniversity = () => {
             <div className="mt-10">
                 {page === 'add-university' && <AddUniversity refetch={refetch} />}
                 {page === 'students-shortlist' && <StudentsShortlist />}
-                {(page !== 'add-university' && page !== 'students-shortlist') && <div className="px-3">
+                {page === 'courses' && <Courses />}
+                {(page !== 'add-university' && page !== 'students-shortlist' && page !== 'courses') && <div className="px-3">
                     {isLoading && <div className="flex py-10 justify-center">
                         <CircularProgress />
                     </div>}
@@ -166,4 +194,4 @@ const ShortlistUniversity = () => {
     );
 }
 
-export default ShortlistUniversity;
+export default Universities;

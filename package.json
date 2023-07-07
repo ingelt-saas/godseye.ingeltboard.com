@@ -33,6 +33,7 @@
     "react-dropzone": "^14.2.3",
     "react-h5-audio-player": "^3.8.6",
     "react-hook-form": "^7.44.3",
+    "react-photoswipe-gallery": "^2.2.7",
     "react-player": "^2.12.0",
     "react-router-dom": "^6.12.1",
     "react-simple-star-rating": "^5.1.7",
