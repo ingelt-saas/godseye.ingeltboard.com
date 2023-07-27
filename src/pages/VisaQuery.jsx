@@ -78,7 +78,7 @@ const VisaQueryItem = ({ data, setDeleteConfirm }) => {
             endIcon={<Delete />}
             onClick={(e) => {
                 e.stopPropagation();
-                setDeleteConfirm(student);
+                setDeleteConfirm({ ...student, id: data?.id });
             }}
         >Delete</Button>
     </div>
