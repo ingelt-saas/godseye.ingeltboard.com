@@ -12,6 +12,7 @@ import getFile from "../api/getFile";
 import moment from 'moment';
 import uploadToAWS from "../aws/upload";
 
+// module thumbnail
 const ModuleThumbnail = ({ setThumbnail, setThumbnailError, selectedThumbnail }) => {
 
     const onDrop = useCallback((acceptFile, rejectFile) => {
@@ -41,7 +42,7 @@ const AddModule = () => {
     const [selectedThumbnail, setSelectedThumbnail] = useState(null);
     const [moduleError, setModuleError] = useState('');
     const [thumbnailError, setThumbnailError] = useState('');
-    const [moduleData, setModuleData] = useState({ name: '', description: '', subject: '', releaseDate: null, order: '' });
+    const [moduleData, setModuleData] = useState({ name: '', description: '', type: '', releaseDate: null, order: '' });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [videoProgress, setVideoProgress] = useState(null);
@@ -49,16 +50,17 @@ const AddModule = () => {
     const [search] = useSearchParams();
     const moduleId = search.get('id');
 
-    const onDrop = useCallback((acceptFile, rejectFile) => {
-        if (rejectFile.length > 0) {
-            setModuleError('File type not supported');
-        } else {
-            setModuleError('');
-            setSelectedModule(acceptFile[0]);
-        }
+    const { getInputProps, getRootProps } = useDropzone({
+        onDrop: useCallback((acceptFile, rejectFile) => {
+            if (rejectFile.length > 0) {
+                setModuleError('File type not supported');
+            } else {
+                setModuleError('');
+                setSelectedModule(acceptFile[0]);
+            }
+        }),
+        multiple: false
     });
-
-    const { getInputProps, getRootProps } = useDropzone({ onDrop, accept: { 'video/*': [] }, multiple: false });
 
     // video duration
     const getVideoDuration = (file) => new Promise((resolve) => {
@@ -110,8 +112,8 @@ const AddModule = () => {
             newErrors.name = 'Module name is required';
         }
 
-        if (!moduleData.subject) {
-            newErrors.subject = 'Module subject is required';
+        if (!moduleData.type) {
+            newErrors.type = 'Module type is required';
         }
 
         if (!moduleData.order) {
@@ -148,11 +150,12 @@ const AddModule = () => {
             const duration = await getVideoDuration(selectedModule);
             formData.file = uploadedFiles.video.Key;
             formData.fileSize = selectedModule.size;
+            formData.fileType = selectedModule.mimetype;
             formData.duration = duration;
         }
 
         formData.thumbnail = uploadedFiles.image.Key;
-        formData.subject = moduleData.subject;
+        formData.type = moduleData.type;
         formData.description = moduleData.description;
         formData.name = moduleData.name;
         formData.order = moduleData.order;
@@ -166,7 +169,7 @@ const AddModule = () => {
             toast.success('Module added successfully');
             setSelectedModule(null);
             setSelectedThumbnail(null);
-            setModuleData({ name: '', description: '', subject: '', releaseDate: null, order: '' });
+            setModuleData({ name: '', description: '', type: '', releaseDate: null, order: '' });
             setImageProgress(null);
             setVideoProgress(null);
         } catch (err) {
@@ -195,8 +198,8 @@ const AddModule = () => {
         if (!moduleData.name) {
             newErrors.name = 'Module name is required';
         }
-        if (!moduleData.subject) {
-            newErrors.subject = 'Module subject is required';
+        if (!moduleData.type) {
+            newErrors.type = 'Module type is required';
         }
 
         if (!moduleData.order) {
@@ -237,6 +240,7 @@ const AddModule = () => {
                 const duration = await getVideoDuration(selectedModule);
                 formData.file = uploadedFiles.video.Key;
                 formData.fileSize = selectedModule.size;
+                formData.fileType = selectedModule.mimetype;
                 formData.duration = duration;
             }
 
@@ -246,7 +250,7 @@ const AddModule = () => {
 
         }
 
-        formData.subject = moduleData.subject;
+        formData.type = moduleData.type;
         formData.description = moduleData.description;
         formData.name = moduleData.name;
         formData.order = moduleData.order;
@@ -297,24 +301,15 @@ const AddModule = () => {
 
                         <div {...getRootProps()}>
                             <input {...getInputProps()} />
-                            {selectedModule && <ReactPlayer
-                                url={typeof selectedModule === 'object' ? URL.createObjectURL(selectedModule) : getFile(selectedModule).then(res => res.data)}
-                                style={{ borderRadius: '10px', overflow: 'hidden' }}
-                                playing={false}
-                                width="100%"
-                                height="100%"
-                                volume={1}
-                                pip={true}
-                                controls
-                                config={{
-                                    file: {
-                                        attributes: {
-                                            controlsList: 'nodownload',
-                                        },
-                                    },
-                                }}
-                            />}
 
+                            {typeof selectedModule === 'string' && <div className="py-10 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-5">
+                                <p>Drag 'n' drop module file, or click to select file for update module</p>
+                            </div>
+                            }
+                            {selectedModule && typeof selectedModule === 'object' && <div className="py-5 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-3">
+                                <p className="text-lg font-semibold">{selectedModule?.name}</p>
+                                <p className="text-sm font-semibold opacity-70">{(selectedModule?.size / (1024 * 1024)).toFixed(2)} MB</p>
+                            </div>}
                             {!selectedModule && <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
                                 <p>Drag 'n' drop module here, or click to select module</p>
                             </div>}
@@ -365,22 +360,21 @@ const AddModule = () => {
 
                         <div className="">
                             <FormControl fullWidth size="small">
-                                <InputLabel id="demo-select-small-label">Subject</InputLabel>
+                                <InputLabel id="demo-select-small-label">Type</InputLabel>
                                 <Select
                                     labelId="demo-select-small-label"
                                     id="demo-select-small"
-                                    value={moduleData.subject}
-                                    label="Subject"
-                                    onChange={(e) => setModuleData({ ...moduleData, subject: e.target.value })}
+                                    value={moduleData.type || ''}
+                                    label="Type"
+                                    onChange={(e) => setModuleData({ ...moduleData, type: e.target.value })}
                                 >
-                                    <MenuItem value='All'>All</MenuItem>
-                                    <MenuItem value='Reading'>Reading</MenuItem>
-                                    <MenuItem value='Writing'>Writing</MenuItem>
-                                    <MenuItem value='Speaking'>Speaking</MenuItem>
-                                    <MenuItem value='Listening'>Listening</MenuItem>
+                                    <MenuItem value='modules'>Modules</MenuItem>
+                                    <MenuItem value='library'>Library</MenuItem>
+                                    <MenuItem value='module_ppt'>Module PPT</MenuItem>
+                                    <MenuItem value='mock_test'>Mock Test</MenuItem>
                                 </Select>
                             </FormControl>
-                            {errors?.subject && <span className="mt-1 text-xs text-red-500">{errors.subject}</span>}
+                            {errors?.type && <span className="mt-1 text-xs text-red-500">{errors.type}</span>}
                         </div>
 
                         <div className="">
