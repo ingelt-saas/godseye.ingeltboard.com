@@ -149,19 +149,7 @@ const AddBlog = ({ refetch }) => {
                         {errors?.title && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.title?.message}</p>}
                     </div>
                     <div className="col-span-2">
-                        <RichEditor
-                            initialContent={blog && blog.content}
-                            content={getValues('content')}
-                            changeHandler={(html, text) => {
-                                if (text.trim()) {
-                                    setValue('content', html);
-                                    setValue('textContent', text.trim());
-                                    clearErrors('content');
-                                } else {
-                                    setError('content', { type: 'custom', message: 'Content is required' });
-                                }
-                            }}
-                        />
+                        
                         {errors?.content && <p className="text-xs mt-1 text-left text-red-500 font-medium mb-3">{errors?.content?.message}</p>}
                     </div>
                     <div className="">
