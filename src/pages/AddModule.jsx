@@ -150,7 +150,7 @@ const AddModule = () => {
             const duration = await getVideoDuration(selectedModule);
             formData.file = uploadedFiles.video.Key;
             formData.fileSize = selectedModule.size;
-            formData.fileType = selectedModule.mimetype;
+            formData.fileType = selectedModule.type;
             formData.duration = duration;
         }
 
@@ -240,7 +240,7 @@ const AddModule = () => {
                 const duration = await getVideoDuration(selectedModule);
                 formData.file = uploadedFiles.video.Key;
                 formData.fileSize = selectedModule.size;
-                formData.fileType = selectedModule.mimetype;
+                formData.fileType = selectedModule.type;
                 formData.duration = duration;
             }
 
