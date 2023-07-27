@@ -11,6 +11,7 @@ import Image from "../components/shared/Image";
 import getFile from "../api/getFile";
 import moment from 'moment';
 import uploadToAWS from "../aws/upload";
+import Compressor from 'compressorjs';
 
 // module thumbnail
 const ModuleThumbnail = ({ setThumbnail, setThumbnailError, selectedThumbnail }) => {
@@ -20,7 +21,14 @@ const ModuleThumbnail = ({ setThumbnail, setThumbnailError, selectedThumbnail })
             setThumbnailError('File type not supported');
         } else {
             setThumbnailError('');
-            setThumbnail(acceptFile[0]);
+            new Compressor(acceptFile[0], {
+                maxHeight: 720,
+                maxWidth: 1080,
+                convertTypes: ['image/webp'],
+                convertSize: 1,
+                quality: 0.6,
+                success: (e) => setThumbnail(e),
+            });
         }
     });
 
@@ -303,7 +311,7 @@ const AddModule = () => {
                             <input {...getInputProps()} />
 
                             {typeof selectedModule === 'string' && <div className="py-10 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-5">
-                                <p>Drag 'n' drop module file, or click to select file for update module</p>
+                                <p className="text-center">Drag 'n' drop module file, or click to select file for update module</p>
                             </div>
                             }
                             {selectedModule && typeof selectedModule === 'object' && <div className="py-5 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-3">
@@ -368,8 +376,7 @@ const AddModule = () => {
                                     label="Type"
                                     onChange={(e) => setModuleData({ ...moduleData, type: e.target.value })}
                                 >
-                                    <MenuItem value='modules'>Modules</MenuItem>
-                                    <MenuItem value='library'>Library</MenuItem>
+                                    <MenuItem value='video'>Modules</MenuItem>
                                     <MenuItem value='module_ppt'>Module PPT</MenuItem>
                                     <MenuItem value='mock_test'>Mock Test</MenuItem>
                                 </Select>
