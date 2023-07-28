@@ -16,6 +16,7 @@ import UniversitiesQuery from "../pages/UniversitiesQuery";
 import VisaQuery from "../pages/VisaQuery";
 import Discussions from "../pages/Discussions";
 import Universities from "../pages/Universities";
+import Sessions from "../pages/Sessions";
 
 const Routes = () => {
 
@@ -69,6 +70,10 @@ const Routes = () => {
                 {
                     path: '/visa-query',
                     element: <VisaQuery />
+                },
+                {
+                    path: '/sessions',
+                    element: <Sessions />
                 },
             ]
         }
