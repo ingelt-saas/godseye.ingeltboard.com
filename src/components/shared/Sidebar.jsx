@@ -37,7 +37,7 @@ const NavItem = ({ to, children, collapseMenu, onClick }) => {
                     ? "bg-[#1B3B7D33] text-[#1B3B7D]"
                     : "bg-transparent text-[#7A7C88]"
                 } ${collapseMenu ? "justify-center gap-0" : "justify-start gap-3"
-                } flex items-center text-base font-semibold  rounded-md duration-300 px-3 pt-2 pb-2 mt-1 hover:bg-[#0064E133] hover:text-[#1B3B7D]`
+                } flex items-center text-sm font-semibold  rounded-md duration-300 px-3 pt-2 pb-2 mt-1 hover:bg-[#0064E133] hover:text-[#1B3B7D]`
             }
         >
             {children}
@@ -100,6 +100,11 @@ const SideBar = () => {
         {
             path: "/visa-query",
             label: "Visa Query",
+            icon: <DiscussionSVG />,
+        },
+        {
+            path: "/sessions",
+            label: "Sessions",
             icon: <DiscussionSVG />,
         },
     ];
