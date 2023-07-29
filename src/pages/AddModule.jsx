@@ -80,8 +80,9 @@ const AddModule = () => {
     });
 
     // upload to aws s3 | module thumbnail & module video
-    const uploadVideoAndThumbnail = (video, image) => new Promise(async (resolve, reject) => {
+    const uploadVideoAndThumbnail = (moduleFile, image) => new Promise(async (resolve, reject) => {
         try {
+
             let result = { video: null, image: null };
             if (image) {
                 const uploadedImage = await uploadToAWS(image, 'ingelt/modules/thumbnails', (event) => {
@@ -91,12 +92,13 @@ const AddModule = () => {
             }
 
             // Math.floor(current / total * 100)
-            if (video) {
-                const uploadedVideo = await uploadToAWS(video, 'ingelt/modules/videos', (event) => {
+            if (moduleFile) {
+                const uploadedVideo = await uploadToAWS(moduleFile, 'ingelt/modules/videos', (event) => {
                     setVideoProgress(Math.round((event.loaded * 100) / event.total))
                 });
                 result.video = uploadedVideo;
             }
+
             resolve(result);
         } catch (err) {
             reject(err);
@@ -155,11 +157,10 @@ const AddModule = () => {
         const formData = {};
 
         if (selectedModule) {
-            const duration = await getVideoDuration(selectedModule);
+            // const duration = await getVideoDuration(selectedModule);
             formData.file = uploadedFiles.video.Key;
             formData.fileSize = selectedModule.size;
-            formData.fileType = selectedModule.type;
-            formData.duration = duration;
+            // formData.duration = duration;
         }
 
         formData.thumbnail = uploadedFiles.image.Key;
@@ -245,11 +246,11 @@ const AddModule = () => {
             const uploadedFiles = await uploadVideoAndThumbnail(videoForUpload, imageForUpload);
 
             if (videoForUpload) {
-                const duration = await getVideoDuration(selectedModule);
+                // const duration = await getVideoDuration(selectedModule);
                 formData.file = uploadedFiles.video.Key;
                 formData.fileSize = selectedModule.size;
-                formData.fileType = selectedModule.type;
-                formData.duration = duration;
+                // formData.fileType = selectedModule.type;
+                // formData.duration = duration;
             }
 
             if (imageForUpload) {

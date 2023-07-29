@@ -26,8 +26,8 @@ const Modules = () => {
     const { data: modules, isLoading, refetch } = useQuery({
         queryKey: ['modules', pagination, activeTab, searchQuery],
         queryFn: async () => {
-            const subject = activeTab === 1 ? 'all' : (activeTab === 2 ? 'reading' : (activeTab === 3 ? 'writing' : (activeTab === 4 ? 'speaking' : 'listening')));
-            const res = await moduleApi.read(subject, pagination.page + 1, pagination.rows, searchQuery);
+            const type = activeTab === 1 ? 'video' : (activeTab === 2 ? 'module_ppt' : 'mock_test');
+            const res = await moduleApi.read(type, pagination.page + 1, pagination.rows, searchQuery);
             return res.data;
         }
     });
@@ -164,18 +164,18 @@ const Modules = () => {
                         className={
                             `duration-200 transition-none ease-in ${activeTab === 1 ? 'border-1 py-3 px-5 md:px-8 font-semibold text-[#1B3B7D] border-[#ECECEC] bg-white border-b-0 rounded-t-xl' : 'bg-[#F3F3F3] py-2 px-2 md:px-5 text-sm'
                             }`
-                        }>All</button>
+                        }>Modules</button>
                     <button onClick={() => setActiveTab(2)}
                         className={
                             `duration-200 transition-none ease-in ${activeTab === 2 ? 'border-1 py-3 px-5 md:px-8 font-semibold text-[#1B3B7D] border-[#ECECEC] bg-white border-b-0 rounded-t-xl' : 'bg-[#F3F3F3] py-2 px-2 md:px-5 text-sm'
                             }`
-                        }>Reading</button>
+                        }>Module PPT</button>
                     <button onClick={() => setActiveTab(3)}
                         className={
                             `duration-200 transition-none ease-in ${activeTab === 3 ? 'border-1 py-3 px-5 md:px-8 font-semibold text-[#1B3B7D] border-[#ECECEC] bg-white border-b-0 rounded-t-xl' : 'bg-[#F3F3F3] py-2 px-2 md:px-5 text-sm'
                             }`
-                        }>Writing</button>
-                    <button onClick={() => setActiveTab(4)}
+                        }>Mock Tests</button>
+                    {/* <button onClick={() => setActiveTab(4)}
                         className={
                             `duration-200 transition-none ease-in ${activeTab === 4 ? 'border-1 py-3 px-5 md:px-8 font-semibold text-[#1B3B7D] border-[#ECECEC] bg-white border-b-0 rounded-t-xl' : 'bg-[#F3F3F3] py-2 px-2 md:px-5 text-sm'
                             }`
@@ -184,7 +184,7 @@ const Modules = () => {
                         className={
                             `duration-200 transition-none ease-in ${activeTab === 5 ? 'border-1 py-3 px-5 md:px-8 font-semibold text-[#1B3B7D] border-[#ECECEC] bg-white border-b-0 rounded-t-xl' : 'bg-[#F3F3F3] py-2 px-2 md:px-5 text-sm'
                             }`
-                        }>Listening</button>
+                        }>Listening</button> */}
                 </div>
                 <div className="flex items-end justify-end pt-5 sm:pt-0 md:pl-16 xl:pl-0">
                     <SearchBar handleSubmit={searchModules} />
