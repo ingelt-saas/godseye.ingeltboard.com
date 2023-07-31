@@ -10,6 +10,7 @@ import DeleteConfirmModal from '../components/shared/DeleteConfirmModal';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import AddSession from '../components/Sessions/AddSession';
 
 const DescPopup = ({ data, updateHandler }) => {
 
@@ -135,6 +136,7 @@ const Sessions = () => {
 
     // states
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     // fetch sessions
     const { data: sessions, isLoading, refetch } = useQuery({
@@ -179,7 +181,14 @@ const Sessions = () => {
 
     return (
         <div className="px-5">
-            <h1 className="pb-2 border-b text-3xl font-medium">Sessions</h1>
+            <div className='flex justify-between items-center border-b py-2 px-5'>
+                <h1 className="text-3xl font-medium">Sessions</h1>
+                <Button
+                    onClick={() => setIsOpen(true)}
+                    variant='contained'
+                    className='!capitalize !font-medium !text-sm !py-3'
+                >Add Session</Button>
+            </div>
             <div className='mt-10'>
                 {isLoading && <div className='flex justify-center py-5'>
                     <CircularProgress />
@@ -247,6 +256,9 @@ const Sessions = () => {
                 confirmHandler={deleteSession}
                 name={'session'}
             />
+
+            {/* session add modal */}
+            <AddSession open={isOpen} close={() => setIsOpen(false)} refetch={refetch} />
 
         </div >
     );
