@@ -17,6 +17,7 @@ import VisaQuery from "../pages/VisaQuery";
 import Discussions from "../pages/Discussions";
 import Universities from "../pages/Universities";
 import Sessions from "../pages/Sessions";
+import InvoiceMail from "../pages/InvoiceMail";
 
 const Routes = () => {
 
@@ -74,6 +75,10 @@ const Routes = () => {
                 {
                     path: '/sessions',
                     element: <Sessions />
+                },
+                {
+                    path: '/invoice-email',
+                    element: <InvoiceMail />
                 },
             ]
         }
