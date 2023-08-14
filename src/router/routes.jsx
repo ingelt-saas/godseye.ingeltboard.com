@@ -12,12 +12,13 @@ import Loader from '../components/shared/Loader';
 import Blogs from "../pages/Blogs";
 import Students from "../pages/Students";
 import LoanQuery from "../pages/LoanQuery";
-import UniversitiesQuery from "../pages/UniversitiesQuery";
+// import UniversitiesQuery from "../pages/UniversitiesQuery";
 import VisaQuery from "../pages/VisaQuery";
 import Discussions from "../pages/Discussions";
 import Universities from "../pages/Universities";
 import Sessions from "../pages/Sessions";
 import InvoiceMail from "../pages/InvoiceMail";
+import ModuleCoupon from "../pages/ModuleCoupon";
 
 const Routes = () => {
 
@@ -79,6 +80,10 @@ const Routes = () => {
                 {
                     path: '/invoice-email',
                     element: <InvoiceMail />
+                },
+                {
+                    path: '/module-coupon',
+                    element: <ModuleCoupon />
                 },
             ]
         }

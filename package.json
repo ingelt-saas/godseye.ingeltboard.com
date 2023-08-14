@@ -28,6 +28,7 @@
     "lexical": "^0.11.1",
     "material-ui-popup-state": "^5.0.9",
     "moment": "^2.29.4",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-cropper": "^2.3.3",
     "react-datepicker": "^4.16.0",
