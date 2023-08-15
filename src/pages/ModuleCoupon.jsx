@@ -8,7 +8,7 @@ import DeleteConfirmModal from '../components/shared/DeleteConfirmModal';
 import PopupState, { bindTrigger, bindPopover } from 'material-ui-popup-state';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import moduleCouponApi from '../api/moduleCoupon';
+import couponApi from '../api/coupon';
 import AddCoupon from '../components/ModuleCoupon/AddCoupon';
 import PropTypes from 'prop-types';
 
@@ -135,7 +135,7 @@ const ModuleCoupon = () => {
     const { data: moduleCoupons, isLoading, refetch } = useQuery({
         queryKey: ['moduleCoupons'],
         queryFn: async () => {
-            const res = await moduleCouponApi.getAll();
+            const res = await couponApi.getAll();
             return res.data;
         }
     });
@@ -148,7 +148,7 @@ const ModuleCoupon = () => {
 
         e.target.disabled = true;
         try {
-            await moduleCouponApi.delete(deleteConfirm?.id);
+            await couponApi.delete(deleteConfirm?.id);
             toast.success('Module coupon deleted');
             setDeleteConfirm(null);
             refetch();
@@ -162,7 +162,7 @@ const ModuleCoupon = () => {
     // update coupon
     const updateCoupon = async (couponId, updateData, successMessage, closePopup = null,) => {
         try {
-            await moduleCouponApi.update(couponId, updateData);
+            await couponApi.update(couponId, updateData);
             typeof closePopup === 'function' && closePopup();
             toast.success(successMessage);
             refetch();

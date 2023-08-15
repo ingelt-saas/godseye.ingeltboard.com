@@ -3,7 +3,7 @@ import { Button, CircularProgress, IconButton, Modal, TextField } from "@mui/mat
 import { useEffect, useState } from "react";
 import ReactDatePicker from "react-datepicker";
 import { Controller, useForm } from "react-hook-form";
-import moduleCouponApi from "../../api/moduleCoupon";
+import couponApi from "../../api/coupon";
 import PropTypes from 'prop-types';
 
 const AddCoupon = ({ open, close, coupons, refetch }) => {
@@ -33,9 +33,11 @@ const AddCoupon = ({ open, close, coupons, refetch }) => {
             return;
         }
 
+        data.couponFor = "module";
+
         setLoading(true);
         try {
-            await moduleCouponApi.create(data);
+            await couponApi.create(data);
             refetch();
             reset();
             handleClose();

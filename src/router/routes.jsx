@@ -19,6 +19,7 @@ import Universities from "../pages/Universities";
 import Sessions from "../pages/Sessions";
 import InvoiceMail from "../pages/InvoiceMail";
 import ModuleCoupon from "../pages/ModuleCoupon";
+import Settings from "../pages/Settings";
 
 const Routes = () => {
 
@@ -84,6 +85,10 @@ const Routes = () => {
                 {
                     path: '/module-coupon',
                     element: <ModuleCoupon />
+                },
+                {
+                    path: '/settings',
+                    element: <Settings />
                 },
             ]
         }
