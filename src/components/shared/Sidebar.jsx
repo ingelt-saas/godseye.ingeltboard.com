@@ -113,6 +113,11 @@ const SideBar = () => {
             label: "Send Invoice",
             icon: <Mail className="!w-5 !h-5" />,
         },
+        {
+            path: "/module-coupon",
+            label: "Module Coupon",
+            icon: <Mail className="!w-5 !h-5" />,
+        },
     ];
 
     return (
