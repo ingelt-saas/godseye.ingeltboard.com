@@ -9,6 +9,7 @@ import { Delete } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import DeleteConfirmModal from "../components/shared/DeleteConfirmModal";
 import StudentInfoModal from "../components/Student/StudentInfoModal";
+import { useSearchParams } from 'react-router-dom';
 
 const Students = () => {
 
@@ -17,14 +18,18 @@ const Students = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [studentInfo, setStudentInfo] = useState(null);
+    const [search, setSearch] = useSearchParams();
+    const page = search.get('page');
 
-    const { data: students = [], isLoading, refetch } = useQuery({
-        queryKey: ['students', pagination, searchQuery, filter],
+    const { data: students = {}, isLoading, refetch } = useQuery({
+        queryKey: ['students', pagination, searchQuery, filter, page],
         queryFn: async () => {
+            const mode = search.get('page') ? search.get('page') : '';
             const res = await studentApi.getStudents(
                 pagination.page,
                 pagination.limit,
                 filter,
+                mode,
                 searchQuery
             );
             return res.data;
@@ -62,12 +67,19 @@ const Students = () => {
             <h1 className="pb-2 border-b text-3xl font-medium">InGelt Students</h1>
             <div className="mt-10">
 
-                <div className="flex mb-10 justify-between">
-                    <div></div>
+                <div className="flex mb-5 justify-between">
+                    <div className="">
+                        <button onClick={() => setSearch({})} className={`!text-sm !font-medium text-[#001E43] bg-[#001E43] bg-opacity-10 duration-300 !capitalize w-24 rounded py-2 ${!page && 'bg-[#001E43] bg-opacity-100 text-white'}`} >All</button>
+                        <button onClick={() => setSearch({ page: 'online' })} className={`!text-sm !font-medium text-[#001E43] bg-[#001E43] bg-opacity-10 duration-300 !capitalize w-24 rounded py-2 ${page === 'online' && 'bg-[#001E43] bg-opacity-100 text-white'}`} >Online</button>
+                        <button onClick={() => setSearch({ page: 'offline' })} className={`!text-sm !font-medium text-[#001E43] bg-[#001E43] bg-opacity-10 duration-300 !capitalize w-24 rounded py-2 ${page === 'offline' && 'bg-[#001E43] bg-opacity-100 text-white'}`} >Offline</button>
+                    </div>
                     <form className="flex items-center" onSubmit={searchHandler}>
                         <input name="search" className="border-2 rounded-md rounded-r-none border-r-0 py-2 px-4 outline-none w-[300px] text-sm" placeholder="Search by student or institute" />
                         <button className="text-sm px-5 py-2 border border-[#001E43] bg-[#001E43] text-white">Search</button>
                     </form>
+                </div>
+                <div className="mb-5">
+                    <p className="text-sm">( {students?.count || 0} Students )</p>
                 </div>
 
                 {/* loading animation */}
@@ -158,6 +170,7 @@ const Students = () => {
                     name={'student'}
                     confirmHandler={deleteStudent}
                 />
+
                 {/* student info modal */}
                 {studentInfo && <StudentInfoModal
                     open={Boolean(studentInfo)}
@@ -166,7 +179,7 @@ const Students = () => {
                 />}
 
             </div>
-        </div>
+        </div >
     );
 }
 
