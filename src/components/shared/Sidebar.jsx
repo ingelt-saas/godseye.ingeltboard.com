@@ -118,6 +118,11 @@ const SideBar = () => {
             label: "Module Coupon",
             icon: <Mail className="!w-5 !h-5" />,
         },
+        {
+            path: "/student-activity",
+            label: "Student Activity",
+            icon: <Mail className="!w-5 !h-5" />,
+        },
     ];
 
     return (
