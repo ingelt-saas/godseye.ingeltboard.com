@@ -29,7 +29,7 @@ const Students = () => {
                 pagination.page,
                 pagination.limit,
                 filter,
-                mode,
+                // mode,
                 searchQuery
             );
             return res.data;

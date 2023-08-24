@@ -20,6 +20,8 @@ import Sessions from "../pages/Sessions";
 import InvoiceMail from "../pages/InvoiceMail";
 import ModuleCoupon from "../pages/ModuleCoupon";
 import Settings from "../pages/Settings";
+import StudentActivity from "../pages/StudentActivity";
+import StudentActivityDetails from "../pages/StudentActivityDetails";
 
 const Routes = () => {
 
@@ -85,6 +87,14 @@ const Routes = () => {
                 {
                     path: '/module-coupon',
                     element: <ModuleCoupon />
+                },
+                {
+                    path: '/student-activity',
+                    element: <StudentActivity />
+                },
+                {
+                    path: '/student-activity/:studentId',
+                    element: <StudentActivityDetails />
                 },
                 {
                     path: '/settings',
