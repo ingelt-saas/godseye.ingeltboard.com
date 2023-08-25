@@ -22,6 +22,8 @@ import ModuleCoupon from "../pages/ModuleCoupon";
 import Settings from "../pages/Settings";
 import StudentActivity from "../pages/StudentActivity";
 import StudentActivityDetails from "../pages/StudentActivityDetails";
+import ResetPassword from '../pages/ResetPassword'
+import UpdatePassword from '../pages/UpdatePassword'
 
 const Routes = () => {
 
@@ -106,6 +108,14 @@ const Routes = () => {
         {
             path: '*',
             element: <LoginLayout />,
+        },
+        {
+            path: '/reset-password',
+            element: <ResetPassword />
+        }, 
+        {
+            path: '/update-password',
+            element: <UpdatePassword />
         }
     ]);
 
