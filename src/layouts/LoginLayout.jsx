@@ -2,6 +2,7 @@ import { Typography, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import authApi from "../api/auth";
 import Cookies from "js-cookie";
+import {Link} from 'react-router-dom'
 
 const LoginLayout = () => {
 
@@ -58,6 +59,9 @@ const LoginLayout = () => {
                         onChange={(e) => setData({ ...data, password: e.target.value })}
                     />
                     {error && <p className="text-center text-red-500 text-xs font-medium">{error}</p>}
+                    <Link to="/reset-password">
+                        <span className="text-center text-blue-500 text-xs font-medium">Forgot Password?</span>
+                    </Link>
                     <Button
                         disabled={Object.values(data).includes('') || loading}
                         type="submit"
