@@ -1,23 +1,29 @@
 // React Support
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-
+import Cookies from "js-cookie";
 // MUI Support
 import Drawer from "@mui/material/Drawer";
-import { Mail } from '@mui/icons-material';
+import { Mail, WindowOutlined } from '@mui/icons-material';
 
 // Sidebar SVGs
 import {
-    DatabaseSVG,
     DiscussionSVG,
     HomeSVG,
     LogoutSVG,
     SettingSVG,
-    StudentSVG,
-    TeacherSVG,
-    AssignmentSVG,
-    NotesSVG,
     LibrarySVG,
+    ModuleSVG,
+    InstituteSVG,
+    UniversitySVG,
+    BlogSVG,
+    StudentSVG,
+    LoanSVG,
+    VisaSVG,
+    SessionSVG,
+    InvoiceSVG,
+    CouponSVG,
+    StudentActivitySVG
 } from "./SidebarSVG.jsx";
 
 //assets
@@ -50,7 +56,11 @@ const SideBar = () => {
     const [open, setOpen] = useState(false);
     const [collapseMenu, setCollapseMenu] = useState(false);
 
-    const { admin, logOut } = useContext(AdminContext);
+    const { admin } = useContext(AdminContext);
+    const logOut = ()=>{
+        Cookies.remove('ingelt_token');
+        location.reload();
+    }
 
     const menuLinks = [
         {
@@ -66,17 +76,17 @@ const SideBar = () => {
         {
             path: "/modules",
             label: "Modules",
-            icon: <LibrarySVG />,
+            icon: <ModuleSVG />,
         },
         {
             path: "/institute",
             label: "Instiute",
-            icon: <LibrarySVG />,
+            icon: <InstituteSVG />,
         },
         {
             path: "/university",
             label: "University",
-            icon: <LibrarySVG />,
+            icon: <UniversitySVG />,
         },
         {
             path: "/discussion",
@@ -86,42 +96,42 @@ const SideBar = () => {
         {
             path: "/blogs",
             label: "Blogs",
-            icon: <DiscussionSVG />,
+            icon: <BlogSVG />,
         },
         {
             path: "/students",
             label: "Students",
-            icon: <DiscussionSVG />,
+            icon: <StudentSVG />,
         },
         {
             path: "/loan-query",
             label: "Loan Query",
-            icon: <DiscussionSVG />,
+            icon: <LoanSVG />,
         },
         {
             path: "/visa-query",
             label: "Visa Query",
-            icon: <DiscussionSVG />,
+            icon: <VisaSVG />,
         },
         {
             path: "/sessions",
             label: "Sessions",
-            icon: <DiscussionSVG />,
+            icon: <SessionSVG />,
         },
         {
             path: "/invoice-email",
             label: "Send Invoice",
-            icon: <Mail className="!w-5 !h-5" />,
+            icon: <InvoiceSVG />,
         },
         {
             path: "/module-coupon",
             label: "Module Coupon",
-            icon: <Mail className="!w-5 !h-5" />,
+            icon: <CouponSVG />,
         },
         {
             path: "/student-activity",
             label: "Student Activity",
-            icon: <Mail className="!w-5 !h-5" />,
+            icon: <StudentActivitySVG />,
         },
     ];
 

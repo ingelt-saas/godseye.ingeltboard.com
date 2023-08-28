@@ -152,7 +152,7 @@ const InstituteItem = ({ applyHandler, institute, setDeleteConfirm }) => {
                     </div>
                 </div> */}
                 <div className="flex justify-between items-start mt-2">
-                    <div className="flex items-start gap-x-2">
+                    <div className="flex items-start gap-x-2 items-center">
                         <img src={img4} alt='' className="w-8 h-auto" />
                         <h2 className="text-[#CC8900] text-base font-semibold -mt-1">
                             Free Video Modules & Resources
