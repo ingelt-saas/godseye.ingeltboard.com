@@ -15,3 +15,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.google-review-video video {
+  object-fit: cover !important;
+}

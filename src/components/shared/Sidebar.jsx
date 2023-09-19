@@ -57,7 +57,7 @@ const SideBar = () => {
     const [collapseMenu, setCollapseMenu] = useState(false);
 
     const { admin } = useContext(AdminContext);
-    const logOut = ()=>{
+    const logOut = () => {
         Cookies.remove('ingelt_token');
         location.reload();
     }
@@ -131,6 +131,11 @@ const SideBar = () => {
         {
             path: "/student-activity",
             label: "Student Activity",
+            icon: <StudentActivitySVG />,
+        },
+        {
+            path: "/student-feedback",
+            label: "Student Feedback",
             icon: <StudentActivitySVG />,
         },
     ];
