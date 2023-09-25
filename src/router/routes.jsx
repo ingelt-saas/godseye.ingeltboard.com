@@ -24,6 +24,7 @@ import StudentActivity from "../pages/StudentActivity";
 import StudentActivityDetails from "../pages/StudentActivityDetails";
 import ResetPassword from '../pages/ResetPassword'
 import UpdatePassword from '../pages/UpdatePassword'
+import StudentFeedback from "../pages/StudentFeedback";
 
 const Routes = () => {
 
@@ -95,6 +96,10 @@ const Routes = () => {
                     element: <StudentActivity />
                 },
                 {
+                    path: '/student-feedback',
+                    element: <StudentFeedback />
+                },
+                {
                     path: '/student-activity/:studentId',
                     element: <StudentActivityDetails />
                 },
@@ -112,7 +117,7 @@ const Routes = () => {
         {
             path: '/reset-password',
             element: <ResetPassword />
-        }, 
+        },
         {
             path: '/update-password',
             element: <UpdatePassword />
