@@ -1,3 +1,4 @@
+import Compressor from "compressorjs";
 import moment from "moment";
 
 export const bytesToSize = (bytes) => {
@@ -32,3 +33,29 @@ export const formatDate = (date) => {
     }
 
 }
+
+// file to data url 
+
+export const __fileToDataURL = (file) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+        const dataUrl = reader.result;
+        resolve(dataUrl);
+    };
+    reader.readAsDataURL(file);
+});
+
+
+export const __compressedImage = (file) => new Promise((resolve, reject) => {
+    new Compressor(file, {
+        quality: 0.6,
+        convertSize: 1,
+        maxHeight: '1080',
+        maxWidth: '1080',
+        convertTypes: ["image/webp"],
+        success: (result) => {
+            resolve(result);
+        },
+        error: (err) => reject(err),
+    });
+});

@@ -4,11 +4,11 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 // Components
 import MessageBox from "../components/Discussions/MessageBox";
 
-import { useRef } from "react";
 import { SocketContext } from "../contexts";
 import DiscussionReports from "../components/Discussions/DiscussionReports";
 import headerImg from '../assets/discussion-header.png';
 import { formatDate } from "../utilities";
+import SendForm from "../components/Discussions/SendForm";
 
 const Discussions = () => {
 
@@ -18,8 +18,9 @@ const Discussions = () => {
   // states
   const [onlineMembers, setOnlineMembers] = useState(0);
   const [totalMembers, setTotalMembers] = useState(0);
-  const [discussionModal, setDiscussionModal] = useState(null);
-  const messageBoxRef = useRef();
+  const [reportModal, setReportModal] = useState(null);
+  const [replyDiscussion, setReplyDiscussion] = useState(null);
+
   const limit = 20;
 
   const formatNumber = (number) => {
@@ -74,7 +75,6 @@ const Discussions = () => {
     };
     getAll();
   }, []);
-
 
   // Check For new messages and update the state
   useEffect(() => {
@@ -178,18 +178,24 @@ const Discussions = () => {
                 <div className="b relative mx-auto h-16 w-44 flex justify-center items-center" onClick={fetchNextPage}>
                   <div className="i h-12 w-44 bg-[#1B3B7D] items-center rounded-xl shadow-2xl cursor-pointer absolute overflow-hidden transform hover:scale-x-110 hover:scale-y-105 transition duration-300 ease-out">
                   </div>
-                  <p className="text-center text-white font-semibold z-10 pointer-events-none">Load More</p>
+                  <p className="text-center text-white font-semibold z-10 text-sm pointer-events-none">Load More</p>
                 </div>
               </div>}
 
               {/* show discussions */}
               {isSuccess &&
                 [...discussions.pages].reverse().map(item =>
-                  [...Object.keys(item.rows)].reverse().map(key => <>
-                    <div className="w-full py-4 flex justify-center" index={key} >
-                      <span className="px-5 py-1 shadow-sm rounded-2xl bg-[#1b3b7d] text-base font-light text-white">{formatDate(key)}</span>
+                  [...Object.keys(item.rows)].reverse().map((key, index) => <>
+                    <div className="w-full py-4 flex justify-center" key={index} >
+                      <span className="px-5 py-1 shadow-sm rounded-2xl bg-[#1b3b7d] text-sm font-light text-white">{formatDate(key)}</span>
                     </div>
-                    {[...item.rows[key]].reverse().map(discussion => <MessageBox key={discussion.id} data={discussion} setDiscussionModal={setDiscussionModal} />)}
+                    {[...item.rows[key]].reverse().map(discussion => <MessageBox
+                      key={discussion.id}
+                      data={discussion}
+                      setReplyDiscussion={setReplyDiscussion}
+                      setDiscussionModal={setReportModal}
+                      setReportModal={setReportModal}
+                    />)}
                   </>)
                 )
               }
@@ -198,14 +204,16 @@ const Discussions = () => {
 
           </div>
         </div>
-        <div ref={messageBoxRef} />
+
+        <SendForm refetch={refetch} replyDiscussion={replyDiscussion} setReplyDiscussion={setReplyDiscussion} />
+
       </div>
 
       {/* discussion reports modal */}
       <DiscussionReports
-        close={() => setDiscussionModal(null)}
-        open={Boolean(discussionModal)}
-        discussion={discussionModal}
+        close={() => setReportModal(null)}
+        open={Boolean(reportModal)}
+        discussion={reportModal}
       />
     </>
   );
