@@ -25,6 +25,7 @@ const OnlineStudents = ({ setDeleteConfirm, setStudentInfo }) => {
     // get online students
     useEffect(() => {
         socket.on('get-online-students', (onlineStudents) => {
+            console.log(onlineStudents);
             setStudentsId(onlineStudents);
         });
     }, []);
@@ -32,7 +33,7 @@ const OnlineStudents = ({ setDeleteConfirm, setStudentInfo }) => {
     return (
         <>
             <div className="mb-5">
-                <p className="text-sm">( {students?.length || 0} Students )</p>
+                <p className="text-sm">( {studentsId?.length || 0} Students )</p>
             </div>
 
             {/* loading animation */}
