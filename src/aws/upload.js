@@ -1,7 +1,7 @@
 import client from "./config";
 import { Upload } from "@aws-sdk/lib-storage";
 
-const uploadToAWS = (file, filePath, uploadProgress) => new Promise(async (resolve, reject) => {
+const uploadToAWS = (file, filePath, uploadProgress) => new Promise((resolve, reject) => {
     try {
 
         let ext = file.type.split('/')[1];
@@ -19,7 +19,7 @@ const uploadToAWS = (file, filePath, uploadProgress) => new Promise(async (resol
             params: params
         });
         upload.on('httpUploadProgress', (e) => typeof uploadProgress === 'function' && uploadProgress(e));
-        const result = await upload.done();
+        const result =  upload.done();
         resolve({ result, Key: `${filePath}/${fileName}` });
 
     } catch (err) {

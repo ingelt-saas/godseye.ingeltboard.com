@@ -1,5 +1,5 @@
-import { ListItemButton, Textarea } from "@mui/joy";
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment, CircularProgress, LinearProgress } from "@mui/material";
+// import { ListItemButton, Textarea } from "@mui/joy";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField, InputAdornment, CircularProgress, LinearProgress, TextareaAutosize } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import ReactPlayer from "react-player";
@@ -38,7 +38,7 @@ const ModuleThumbnail = ({ setThumbnail, setThumbnailError, selectedThumbnail })
         {selectedThumbnail && typeof selectedThumbnail === 'string' && <Image src={selectedThumbnail} alt='' className={'w-full h-auto'} />}
         {selectedThumbnail && typeof selectedThumbnail === 'object' && <img src={URL.createObjectURL(selectedThumbnail)} alt='' className='w-full h-auto' />}
         {!selectedThumbnail && <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
-            <p>Drag 'n' drop module thumbnail here, or click to select module thumbnail</p>
+            <p>Dragn drop module thumbnail here, or click to select module thumbnail</p>
         </div>
         }
     </div>);
@@ -80,12 +80,12 @@ const AddModule = () => {
     });
 
     // upload to aws s3 | module thumbnail & module video
-    const uploadVideoAndThumbnail = (moduleFile, image) => new Promise(async (resolve, reject) => {
+    const uploadVideoAndThumbnail = (moduleFile, image) => new Promise((resolve, reject) => {
         try {
 
             let result = { video: null, image: null };
             if (image) {
-                const uploadedImage = await uploadToAWS(image, 'ingelt/modules/thumbnails', (event) => {
+                const uploadedImage = uploadToAWS(image, 'ingelt/modules/thumbnails', (event) => {
                     setImageProgress(Math.round((event.loaded * 100) / event.total));
                 });
                 result.image = uploadedImage;
@@ -93,7 +93,7 @@ const AddModule = () => {
 
             // Math.floor(current / total * 100)
             if (moduleFile) {
-                const uploadedVideo = await uploadToAWS(moduleFile, 'ingelt/modules/videos', (event) => {
+                const uploadedVideo = uploadToAWS(moduleFile, 'ingelt/modules/videos', (event) => {
                     setVideoProgress(Math.round((event.loaded * 100) / event.total))
                 });
                 result.video = uploadedVideo;
@@ -195,8 +195,8 @@ const AddModule = () => {
     const updateModule = async (e) => {
 
         const newErrors = {};
-        const currentDateTime = new Date();
-        const releaseDate = new Date(moduleData.releaseDate);
+        // const currentDateTime = new Date();
+        // const releaseDate = new Date(moduleData.releaseDate);
 
         if (!selectedThumbnail) {
             newErrors.thumbnail = 'Module thumbnail is required';
@@ -312,7 +312,7 @@ const AddModule = () => {
                             <input {...getInputProps()} />
 
                             {typeof selectedModule === 'string' && <div className="py-10 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-5">
-                                <p className="text-center">Drag 'n' drop module file, or click to select file for update module</p>
+                                <p className="text-center">Drag drop module file, or click to select file for update module</p>
                             </div>
                             }
                             {selectedModule && typeof selectedModule === 'object' && <div className="py-5 bg-white border-2 border-dashed border-black text-left shadow-md opacity-80 px-3">
@@ -320,7 +320,7 @@ const AddModule = () => {
                                 <p className="text-sm font-semibold opacity-70">{(selectedModule?.size / (1024 * 1024)).toFixed(2)} MB</p>
                             </div>}
                             {!selectedModule && <div className="py-10 bg-white border-2 border-dashed border-black text-center shadow-md opacity-80">
-                                <p>Drag 'n' drop module here, or click to select module</p>
+                                <p>Dragn drop module here, or click to select module</p>
                             </div>}
                         </div>
 
@@ -343,7 +343,7 @@ const AddModule = () => {
                             <TextField
                                 fullWidth
                                 label='Name'
-                                variant="outlined"
+                                // variant="outlined"
                                 size="small"
                                 value={moduleData.name}
                                 type="text"
@@ -353,7 +353,7 @@ const AddModule = () => {
                         </div>
 
                         <div>
-                            <Textarea
+                            <TextareaAutosize
                                 placeholder="Description...."
                                 value={moduleData.description}
                                 onChange={(e) => setModuleData({ ...moduleData, description: e.target.value })}
@@ -402,7 +402,7 @@ const AddModule = () => {
                             <TextField
                                 fullWidth
                                 label='Release Date'
-                                variant="outlined"
+                                // variant="outlined"
                                 size="small"
                                 value={moduleData.releaseDate ? moment(moduleData.releaseDate).format('YYYY-MM-DDTHH:mm') : ''}
                                 InputLabelProps={{ shrink: true }}

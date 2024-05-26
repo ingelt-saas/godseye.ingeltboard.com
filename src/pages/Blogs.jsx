@@ -15,19 +15,19 @@ import parse from 'html-react-parser';
 
 const BlogCard = ({ data, deleteConfirm, viewBlog }) => {
 
-    const { picture, title, textContent, category, createdAt } = data;
+    // const { picture, title, textContent, category, createdAt } = data;
 
     return (<div className='rounded-lg shadow-md border border-[#78787840]'>
         <div className='rounded-lg overflow-hidden md:h-36 xl:h-48'>
-            <Image src={picture} alt={title} className='w-full h-full object-cover' />
+            <Image src={data.picture} alt={data.title} className='w-full h-full object-cover' />
         </div>
         <div className='px-3 py-4 flex flex-col gap-y-3'>
             <div className="flex justify-between items-center">
-                <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{category}</span>
-                <span className="text-xs font-medium">{moment(createdAt).format('lll')}</span>
+                <span className="bg-[#0C3C82] text-white text-xs rounded-full px-3 py-1 w-fit">{data.category}</span>
+                <span className="text-xs font-medium">{moment(data.createdAt).format('lll')}</span>
             </div>
-            <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{title}</h1>
-            <p className='text-sm text-[#0C3C82] font-medium'>{textContent.length > 100 ? textContent.split('').slice(0, 100).join('') + '...' : textContent}</p>
+            <h1 className='text-xl text-[#0C3C82] font-medium leading-none'>{data.title}</h1>
+            {/* <p className='text-sm text-[#0C3C82] font-medium'>{data.textContent && data.textContent.length > 100 ? data.textContent.split('').slice(0, 100).join('') + '...' : textContent}</p> */}
             <div className="flex justify-between">
                 <button onClick={() => viewBlog(data)} className='text-sm font-medium inline-flex items-center gap-1 w-fit'>
                     Read Post

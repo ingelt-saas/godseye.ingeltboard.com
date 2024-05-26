@@ -28,6 +28,7 @@ const Modules = () => {
         queryFn: async () => {
             const type = activeTab === 1 ? 'video' : (activeTab === 2 ? 'module_ppt' : 'mock_test');
             const res = await moduleApi.read(type, pagination.page + 1, pagination.rows, searchQuery);
+            console.log(res.data);
             return res.data;
         }
     });

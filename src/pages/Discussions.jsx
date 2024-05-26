@@ -94,7 +94,7 @@ const Discussions = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, []);
+  }, [socket,refetch]);
 
   return (
     <>
